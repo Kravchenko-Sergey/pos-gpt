@@ -44,29 +44,6 @@ function normalizeQuery(query: string): string {
 	return normalized
 }
 
-function isErrorQuery(query: string): boolean {
-	const errorIndicators = ['ошибк', 'код ошибк', 'error']
-	for (const indicator of errorIndicators) {
-		if (query.includes(indicator)) return true
-	}
-	return false
-}
-
-function isFirmwareQuery(query: string): boolean {
-	const firmwareIndicators = [
-		'прошивк',
-		'прошить',
-		'обновить',
-		'firmware',
-		'update',
-		'файл прошивки'
-	]
-	for (const indicator of firmwareIndicators) {
-		if (query.includes(indicator)) return true
-	}
-	return false
-}
-
 function handleSpecialQueries(
 	query: string
 ): { response: string; handled: boolean } | null {
@@ -225,6 +202,11 @@ export async function GET(request: NextRequest) {
 		})
 	}
 
+	// Определяем тип запроса по ключевым словам
+	const hasFirmwareWord =
+		/прошивк|прошить|обновит|файл прошивки|firmware|update/i.test(rawQuery)
+	const hasErrorWord = /ошибк|код|error/i.test(rawQuery)
+
 	const docsDir = path.join(process.cwd(), 'public/docs')
 
 	try {
@@ -242,6 +224,25 @@ export async function GET(request: NextRequest) {
 		for (const { path: filePath, content: fullContent } of cachedFiles) {
 			const relativePath = path.relative(docsDir, filePath)
 			const displayName = relativePath.replace(/\.txt$/, '')
+
+			// Определяем тип файла по содержимому
+			const isErrorFile =
+				fullContent.includes('КОД ОШИБКИ') ||
+				fullContent.includes('=== КОД ОШИБКИ ===')
+			const isFirmwareFile =
+				fullContent.includes('ПРОШИВКА') ||
+				fullContent.includes('прошивка') ||
+				fullContent.includes('=== МОДЕЛЬ:')
+
+			// Если запрос про прошивку - пропускаем файлы ошибок
+			if (hasFirmwareWord && isErrorFile) {
+				continue
+			}
+
+			// Если запрос про ошибку - пропускаем файлы прошивок
+			if (hasErrorWord && isFirmwareFile) {
+				continue
+			}
 
 			const keywordSectionIndex = fullContent.indexOf('--- КЛЮЧЕВЫЕ СЛОВА ---')
 			if (keywordSectionIndex === -1) continue
@@ -294,38 +295,16 @@ export async function GET(request: NextRequest) {
 				.map((line) => line.trim().toLowerCase())
 				.filter((line) => line.length > 0 && !line.includes('---'))
 
-			// Определяем тип файла
-			const isErrorFile =
-				contentWithoutKeywords.includes('КОД ОШИБКИ') ||
-				displayName.includes('ошибк') ||
-				displayName.includes('error')
-
-			const isFirmwareFile =
-				contentWithoutKeywords.includes('ПРОШИВКА') ||
-				contentWithoutKeywords.includes('прошивка') ||
-				displayName.includes('прошивк')
-
-			// Определяем тип запроса
-			const isLookingForError = isErrorQuery(rawQuery)
-			const isLookingForFirmware = isFirmwareQuery(rawQuery)
-
 			let isMatch = false
 
 			// Если запрос - короткое число (1-2 цифры)
 			if (/^\d{1,2}$/.test(query)) {
-				// Ищем только в файлах ошибок с точным совпадением
-				if (isErrorFile && keywords.includes(query)) {
-					isMatch = true
-				}
-				// Ищем в файлах прошивки только если есть "5i", "6", "7.3" и т.д.
-				else if (
-					isFirmwareFile &&
-					(keywords.includes(query + 'i') || keywords.includes(query + '.3'))
-				) {
+				// Ищем точное совпадение в ключевых словах
+				if (keywords.includes(query)) {
 					isMatch = true
 				}
 			}
-			// Если запрос - длинное число (3-4 цифры) - код ошибки
+			// Если запрос - длинное число (3-4 цифры)
 			else if (/^\d{3,4}$/.test(query)) {
 				for (const keyword of keywords) {
 					const numbers = keyword.match(/\d+/g)
@@ -337,64 +316,16 @@ export async function GET(request: NextRequest) {
 			}
 			// Текстовые запросы
 			else {
-				// Проверяем, есть ли в запросе слово "прошивка" или "прошить" (приоритет!)
-				const hasFirmwareWord =
-					rawQuery.includes('прошивка') ||
-					rawQuery.includes('прошить') ||
-					rawQuery.includes('firmware') ||
-					rawQuery.includes('update')
-
-				// Если это запрос про прошивку - ищем только файлы прошивки
-				if (hasFirmwareWord) {
-					for (const keyword of keywords) {
-						if (
-							isFirmwareFile &&
-							(query.includes(keyword) || keyword.includes(query))
-						) {
+				for (const keyword of keywords) {
+					if (query.length >= 3) {
+						if (query.includes(keyword) || keyword.includes(query)) {
 							isMatch = true
 							break
 						}
-					}
-				}
-				// Иначе проверяем на ошибку
-				else {
-					const hasErrorWord =
-						rawQuery.includes('ошибка') ||
-						rawQuery.includes('код') ||
-						rawQuery.includes('error')
-					const numbersInQuery = rawQuery.match(/\d+/g)
-					const errorCode = numbersInQuery ? numbersInQuery[0] : null
-
-					for (const keyword of keywords) {
-						// Если ищем ошибку и это файл прошивки - пропускаем
-						if (hasErrorWord && isFirmwareFile) continue
-
-						// Если запрос содержит слово "ошибка" и число
-						if (hasErrorWord && errorCode) {
-							if (
-								isErrorFile &&
-								(keyword === errorCode ||
-									keyword.includes(` ${errorCode} `) ||
-									keyword.startsWith(`${errorCode} `) ||
-									keyword.endsWith(` ${errorCode}`))
-							) {
-								isMatch = true
-								break
-							}
-						}
-						// Обычный поиск (число без контекста)
-						else {
-							if (query.length >= 3) {
-								if (query.includes(keyword) || keyword.includes(query)) {
-									isMatch = true
-									break
-								}
-							} else {
-								if (keyword === query) {
-									isMatch = true
-									break
-								}
-							}
+					} else {
+						if (keyword === query) {
+							isMatch = true
+							break
 						}
 					}
 				}
@@ -409,15 +340,13 @@ export async function GET(request: NextRequest) {
 			}
 		}
 
-		results.sort((a, b) => {
-			const aExact = a.filename === query
-			const bExact = b.filename === query
-			if (aExact && !bExact) return -1
-			if (!aExact && bExact) return 1
-			return a.filename.length - b.filename.length
-		})
+		// Удаляем дубликаты по filename
+		const uniqueResults = results.filter(
+			(result, index, self) =>
+				index === self.findIndex((r) => r.filename === result.filename)
+		)
 
-		return NextResponse.json({ results })
+		return NextResponse.json({ results: uniqueResults })
 	} catch (error: any) {
 		console.error('Ошибка:', error)
 		return NextResponse.json({ results: [], error: error.message })
