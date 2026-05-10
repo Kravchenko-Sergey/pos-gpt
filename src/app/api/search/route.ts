@@ -26,7 +26,6 @@ function normalizeQuery(query: string): string {
 		.replace(/\s+/g, ' ')
 		.replace(/[ё]/g, 'е')
 
-	// Удаляем распространённые слова-паразиты
 	const stopWords = [
 		'мне',
 		'нужен',
@@ -45,17 +44,38 @@ function normalizeQuery(query: string): string {
 	return normalized
 }
 
+function isErrorQuery(query: string): boolean {
+	const errorIndicators = ['ошибк', 'код ошибк', 'error']
+	for (const indicator of errorIndicators) {
+		if (query.includes(indicator)) return true
+	}
+	return false
+}
+
+function isFirmwareQuery(query: string): boolean {
+	const firmwareIndicators = [
+		'прошивк',
+		'прошить',
+		'обновить',
+		'firmware',
+		'update',
+		'файл прошивки'
+	]
+	for (const indicator of firmwareIndicators) {
+		if (query.includes(indicator)) return true
+	}
+	return false
+}
+
 function handleSpecialQueries(
 	query: string
 ): { response: string; handled: boolean } | null {
-	// Удаляем знаки препинания в конце для проверки
 	const cleanQuery = query
 		.toLowerCase()
 		.replace(/[!?.,;:]$/, '')
 		.trim()
 	const q = cleanQuery
 
-	// Приветствия
 	if (
 		q.match(
 			/^(привет|здравствуй|здрасте|hi|hello|hey|доброе утро|добрый день|добрый вечер|здорово|приветствую|салют)$/
@@ -68,7 +88,6 @@ function handleSpecialQueries(
 		}
 	}
 
-	// Как дела (с учётом знаков вопроса)
 	if (
 		q.match(
 			/^(как дела|как ты|как жизнь|how are you|как настроение|как сам|как поживаешь|как оно|чё как|что нового)$/
@@ -80,7 +99,6 @@ function handleSpecialQueries(
 		}
 	}
 
-	// Что умеешь
 	if (
 		q.match(
 			/^(что ты умеешь|как тебя использовать|что можешь|твои возможности|что ты можешь|как работать|помощь|help|функции|возможности|что делаешь|чем полезен)$/
@@ -93,7 +111,6 @@ function handleSpecialQueries(
 		}
 	}
 
-	// Кто ты
 	if (
 		q.match(
 			/^(кто ты|ты кто|твое имя|как тебя зовут|представься|расскажи о себе|что ты)$/
@@ -106,7 +123,6 @@ function handleSpecialQueries(
 		}
 	}
 
-	// Спасибо
 	if (
 		q.match(/^(спасибо|благодарю|thanks|thank you|спс|благодарствую|merci)$/)
 	) {
@@ -116,7 +132,6 @@ function handleSpecialQueries(
 		}
 	}
 
-	// Прощание
 	if (
 		q.match(
 			/^(пока|до свидания|goodbye|bye|прощай|увидимся|всего хорошего|до встречи)$/
@@ -128,7 +143,6 @@ function handleSpecialQueries(
 		}
 	}
 
-	// Извинения
 	if (q.match(/^(извини|прости|sorry|пардон|виноват|извиняюсь)$/)) {
 		return {
 			response: 'Ничего страшного! Чем могу помочь?',
@@ -136,7 +150,6 @@ function handleSpecialQueries(
 		}
 	}
 
-	// Согласие
 	if (q.match(/^(да|ага|ок|ok|хорошо|ладно|понял|ясно)$/)) {
 		return {
 			response:
@@ -145,7 +158,6 @@ function handleSpecialQueries(
 		}
 	}
 
-	// Шутки
 	if (
 		q.match(/^(расскажи шутку|рассмеши|прикол|забавно|анекдот|пошути|смешно)$/)
 	) {
@@ -156,7 +168,6 @@ function handleSpecialQueries(
 		}
 	}
 
-	// Комплименты
 	if (q.match(/^(ты крут|ты молодец|хороший бот|классный|умный|хвалю)$/)) {
 		return {
 			response: 'Спасибо! Стараюсь помогать как могу 😊',
@@ -164,7 +175,6 @@ function handleSpecialQueries(
 		}
 	}
 
-	// Мат
 	const badWords = [
 		'хуй',
 		'пизда',
@@ -201,8 +211,6 @@ let cachedFiles: { path: string; content: string }[] | null = null
 export async function GET(request: NextRequest) {
 	const searchParams = request.nextUrl.searchParams
 	const rawQuery = searchParams.get('q')?.trim() || ''
-
-	// Нормализуем запрос (удаляем слова-паразиты)
 	const query = normalizeQuery(rawQuery)
 
 	if (!query) {
@@ -286,16 +294,111 @@ export async function GET(request: NextRequest) {
 				.map((line) => line.trim().toLowerCase())
 				.filter((line) => line.length > 0 && !line.includes('---'))
 
-			// Проверяем совпадение:
-			// 1. Запрос содержит ключевую фразу
-			// 2. Ключевая фраза содержит запрос
-			// 3. Игнорируем слишком короткие запросы (<3 символов)
-			const isMatch = keywords.some((keyword) => {
-				if (query.length >= 3) {
-					return query.includes(keyword) || keyword.includes(query)
+			// Определяем тип файла
+			const isErrorFile =
+				contentWithoutKeywords.includes('КОД ОШИБКИ') ||
+				displayName.includes('ошибк') ||
+				displayName.includes('error')
+
+			const isFirmwareFile =
+				contentWithoutKeywords.includes('ПРОШИВКА') ||
+				contentWithoutKeywords.includes('прошивка') ||
+				displayName.includes('прошивк')
+
+			// Определяем тип запроса
+			const isLookingForError = isErrorQuery(rawQuery)
+			const isLookingForFirmware = isFirmwareQuery(rawQuery)
+
+			let isMatch = false
+
+			// Если запрос - короткое число (1-2 цифры)
+			if (/^\d{1,2}$/.test(query)) {
+				// Ищем только в файлах ошибок с точным совпадением
+				if (isErrorFile && keywords.includes(query)) {
+					isMatch = true
 				}
-				return keyword === query
-			})
+				// Ищем в файлах прошивки только если есть "5i", "6", "7.3" и т.д.
+				else if (
+					isFirmwareFile &&
+					(keywords.includes(query + 'i') || keywords.includes(query + '.3'))
+				) {
+					isMatch = true
+				}
+			}
+			// Если запрос - длинное число (3-4 цифры) - код ошибки
+			else if (/^\d{3,4}$/.test(query)) {
+				for (const keyword of keywords) {
+					const numbers = keyword.match(/\d+/g)
+					if (numbers && numbers.includes(query)) {
+						isMatch = true
+						break
+					}
+				}
+			}
+			// Текстовые запросы
+			else {
+				// Проверяем, есть ли в запросе слово "прошивка" или "прошить" (приоритет!)
+				const hasFirmwareWord =
+					rawQuery.includes('прошивка') ||
+					rawQuery.includes('прошить') ||
+					rawQuery.includes('firmware') ||
+					rawQuery.includes('update')
+
+				// Если это запрос про прошивку - ищем только файлы прошивки
+				if (hasFirmwareWord) {
+					for (const keyword of keywords) {
+						if (
+							isFirmwareFile &&
+							(query.includes(keyword) || keyword.includes(query))
+						) {
+							isMatch = true
+							break
+						}
+					}
+				}
+				// Иначе проверяем на ошибку
+				else {
+					const hasErrorWord =
+						rawQuery.includes('ошибка') ||
+						rawQuery.includes('код') ||
+						rawQuery.includes('error')
+					const numbersInQuery = rawQuery.match(/\d+/g)
+					const errorCode = numbersInQuery ? numbersInQuery[0] : null
+
+					for (const keyword of keywords) {
+						// Если ищем ошибку и это файл прошивки - пропускаем
+						if (hasErrorWord && isFirmwareFile) continue
+
+						// Если запрос содержит слово "ошибка" и число
+						if (hasErrorWord && errorCode) {
+							if (
+								isErrorFile &&
+								(keyword === errorCode ||
+									keyword.includes(` ${errorCode} `) ||
+									keyword.startsWith(`${errorCode} `) ||
+									keyword.endsWith(` ${errorCode}`))
+							) {
+								isMatch = true
+								break
+							}
+						}
+						// Обычный поиск (число без контекста)
+						else {
+							if (query.length >= 3) {
+								if (query.includes(keyword) || keyword.includes(query)) {
+									isMatch = true
+									break
+								}
+							} else {
+								if (keyword === query) {
+									isMatch = true
+									break
+								}
+							}
+						}
+					}
+				}
+			}
 
 			if (isMatch) {
 				results.push({
@@ -306,13 +409,13 @@ export async function GET(request: NextRequest) {
 			}
 		}
 
-		// Если слишком много результатов (больше 2) и запрос короткий
-		if (results.length > 2 && query.length < 5) {
-			return NextResponse.json({
-				specialResponse: `По запросу "${rawQuery}" найдено ${results.length} результатов. Уточните: например, "прошивка 5i" или "файл прошивки для эвотор 5i"`,
-				results: []
-			})
-		}
+		results.sort((a, b) => {
+			const aExact = a.filename === query
+			const bExact = b.filename === query
+			if (aExact && !bExact) return -1
+			if (!aExact && bExact) return 1
+			return a.filename.length - b.filename.length
+		})
 
 		return NextResponse.json({ results })
 	} catch (error: any) {

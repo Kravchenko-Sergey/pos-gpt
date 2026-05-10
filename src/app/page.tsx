@@ -528,7 +528,7 @@ export default function Home() {
 									strokeWidth='2'
 									strokeLinecap='round'
 									strokeLinejoin='round'
-									className='sm:w-[18px] sm:h-[18px]'
+									className='sm:w-4.5 sm:h-4.5'
 								>
 									<line x1='12' y1='19' x2='12' y2='5' />
 									<polyline points='5 12 12 5 19 12' />
