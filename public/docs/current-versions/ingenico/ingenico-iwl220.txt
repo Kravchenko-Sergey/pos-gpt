@@ -1,0 +1,17 @@
+=== МОДЕЛЬ: Ingenico IWL220 / IWL250 ===
+
+--- АКТУАЛЬНЫЕ ВЕРСИИ ---
+
+UPOS: 33.18.03 (АН)
+Telium OS: 9.32.3v
+
+--- КЛЮЧЕВЫЕ СЛОВА ---
+версии Ingenico IWL220
+актуальные версии Ingenico IWL220
+ingenico iwl220 версии
+iwl220 версии
+upos ingenico iwl220
+версии Ingenico IWL250
+ingenico iwl250 версии
+
+--- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---

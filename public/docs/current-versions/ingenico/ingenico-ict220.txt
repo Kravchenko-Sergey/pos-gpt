@@ -1,0 +1,25 @@
+=== МОДЕЛЬ: Ingenico ICT220 / ICT250 ===
+
+--- АКТУАЛЬНЫЕ ВЕРСИИ ---
+
+ICT2X0:
+UPOS: 33.18.03 (АН)
+Telium OS: 9.32.3v
+
+ICT2X0 + Kozen P10/P12:
+UPOS: 34.09.03 (АН)
+Telium OS: 9.32.3v
+
+--- КЛЮЧЕВЫЕ СЛОВА ---
+версии Ingenico ICT220
+актуальные версии Ingenico ICT220
+ingenico ict220 версии
+ict220 версии
+upos ingenico ict220
+версии Ingenico ICT250
+актуальные версии Ingenico ICT250
+ingenico ict250 версии
+ict250 версии
+ingenico ict250 версии
+
+--- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---

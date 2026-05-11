@@ -1,0 +1,11 @@
+=== Pax USB Driver 2.28 ===
+
+--- КЛЮЧЕВЫЕ СЛОВА ---
+Pax USB Driver
+драйвер pax
+драйвер pax s300
+драйвер pax q25
+драйвер pax d230
+
+--- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---
+Pax USB Driver 2.28: https://disk.yandex.ru/d/0XtlL9aZeqnAHA

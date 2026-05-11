@@ -1,0 +1,58 @@
+=== ДЕФЕКТОВКА Verifone VX520 ===
+
+--- МАГНИТНЫЙ РИДЕР ---
+
+1. Выберите: Terminal Info → Diagnostics → Mag Card Diag
+
+2. Проведите карту — на всех дорожках должно отображаться VALID
+
+--- ЧИПОВЫЙ РИДЕР ---
+
+1. Выберите: Terminal Info → Diagnostics → Smart Card Diag → CHIP CARD DIAG → CUST SLOT DIAG
+
+2. Вставьте карту и нажмите CUST SLOT DIAG
+
+3. Должны отображаться: POWER UP: PASSED и GET ATR: PASSED
+
+--- БЕСКОНТАКТНЫЙ МОДУЛЬ ---
+
+1. Выберите: Terminal Info → Diagnostics → Smart Card Diag → CONTACTLESS DIAG → TAP AND TEST
+
+2. Поднесите карту — должен отображаться SW1_SW2=0x9000 card_type=1
+
+--- КЛАВИАТУРА ---
+
+1. Выберите: Terminal Info → Diagnostics → Keybord Diag
+
+2. Проверьте все клавиши — значения должны отображаться на экране
+
+--- ПРИНТЕР ---
+
+1. Выберите: Terminal Info → Diagnostics → Printer Diag
+
+2. Должен распечататься тестовый чек
+
+--- GPRS ---
+
+1. Выберите: Download → введите пароль → Multi-app → Partial dnld → TCPIP
+
+2. Нажмите красную кнопку и выберите: Control Panel → Tools → Network Maint → GPRS → Network Start GPRS
+
+3. Должен отображаться статус Connected
+
+--- ETHERNET ---
+
+1. Выберите: Download → введите пароль → Multi-app → Partial dnld → TCPIP
+
+2. Нажмите красную кнопку и выберите: Control Panel → Tools → Network Maint → Ethernet → Network Start
+
+3. Должен отображаться статус Connected
+
+--- КЛЮЧЕВЫЕ СЛОВА ---
+дефектовка Verifone VX520
+дефектовка VX520
+как проверить Verifone VX520
+тестирование Verifone VX520
+диагностика Verifone VX520
+verifone vx520 тест
+vx520 дефектовка

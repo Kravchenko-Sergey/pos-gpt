@@ -1,0 +1,26 @@
+=== МОДЕЛЬ: Verifone VX520 ===
+
+--- АКТУАЛЬНЫЕ ВЕРСИИ ---
+
+VX520:
+UPOS: 33.18.03 (АН)
+OS Verix: QT00050
+EOS: 3.3.2.0
+VX-CTLS-2: 01.30.02M6
+
+VX520 + Kozen P10/P12:
+UPOS: 34.09.03 (АН)
+OS Verix: QT00050
+EOS: 3.3.2.0
+VX-CTLS-2: 01.30.02M6
+
+--- КЛЮЧЕВЫЕ СЛОВА ---
+версии Verifone VX520
+актуальные версии Verifone VX520
+verifone vx520 версии
+vx520 версии
+upos verifone vx520
+vx520 kozen p10
+vx520 kozen p12
+
+--- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---
