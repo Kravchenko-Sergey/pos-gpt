@@ -331,7 +331,7 @@ export default function Home() {
 					...prev,
 					{
 						role: 'assistant',
-						content: 'Ничего не нашел. Изложите мысль точнее'
+						content: `Ничего не нашёл по запросу "${userMessage}".\n\n Попробуйте:\n• Указать модель (5i, 6, 7.3, 10)\n• Указать тип (прошивка, ошибка, версии)\n• Написать короче и точнее`
 					}
 				])
 			}
@@ -509,7 +509,7 @@ export default function Home() {
 										handleSubmit(e)
 									}
 								}}
-								placeholder='Например: "прошивка 5i"'
+								placeholder='Например: "прошивка 5i" или "ошибка 4119"'
 								rows={1}
 								className='flex-1 border-none outline-none resize-none py-1.5 sm:py-2 px-0 font-sans bg-transparent max-h-32 sm:max-h-50 text-gray-200 placeholder:text-gray-500 focus:text-white text-xs sm:text-sm'
 								style={{ lineHeight: '1.4' }}

@@ -1,0 +1,35 @@
+=== ПРОШИВКА Kozen P10 ===
+
+ЧТО ПОНАДОБИТСЯ:
+
+1. Ноутбук
+2. Программа Flash Tool: https://disk.yandex.ru/d/rd08ougjIKg4Lg
+3. Файлы прошивки: https://drive.google.com/uc?export=download&id=1f67tVuuqNhm3ah4BcbwK2r2TzHEr1t76
+
+ПРОЦЕСС ПРОШИВКИ ПОШАГОВО:
+
+Шаг 1: Запустите программу Flash Tool
+
+Шаг 2: В поле "Download-Agent" укажите путь к соответствующему файлу
+
+Шаг 3: В поле "Scatter-loading File" укажите путь к scatter-файлу
+
+Шаг 4: Выберите режим "Firmware Upgrade"
+
+Шаг 5: Нажмите кнопку "Download"
+
+Шаг 6: Подключите терминал к ноутбуку
+
+Шаг 7: Дождитесь завершения процесса прошивки
+
+--- КЛЮЧЕВЫЕ СЛОВА ---
+прошивка P10
+прошивка Kozen P10
+прошить P10
+прошить Kozen P10
+как прошить P10
+как прошить Kozen P10
+
+--- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---
+Программа Flash Tool: https://disk.yandex.ru/d/rd08ougjIKg4Lg
+Файлы прошивки: https://drive.google.com/uc?export=download&id=1f67tVuuqNhm3ah4BcbwK2r2TzHEr1t76
