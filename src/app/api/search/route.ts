@@ -20,167 +20,12 @@ async function getAllTxtFiles(dir: string): Promise<string[]> {
 }
 
 function normalizeQuery(query: string): string {
-	let normalized = query
-		.toLowerCase()
-		.trim()
-		.replace(/\s+/g, ' ')
-		.replace(/[ё]/g, 'е')
-
-	const stopWords = [
-		'мне',
-		'нужен',
-		'нужна',
-		'пожалуйста',
-		'скинь',
-		'дай',
-		'скачай',
-		'скачать'
-	]
-	for (const word of stopWords) {
-		normalized = normalized.replace(new RegExp(`\\b${word}\\b`, 'g'), '')
-	}
-	normalized = normalized.replace(/\s+/g, ' ').trim()
-
-	return normalized
+	return query.toLowerCase().trim().replace(/\s+/g, ' ')
 }
 
-function handleSpecialQueries(
-	query: string
-): { response: string; handled: boolean } | null {
-	const cleanQuery = query
-		.toLowerCase()
-		.replace(/[!?.,;:]$/, '')
-		.trim()
-	const q = cleanQuery
-
-	if (
-		q.match(
-			/^(привет|здравствуй|здрасте|hi|hello|hey|доброе утро|добрый день|добрый вечер|здорово|приветствую|салют)$/
-		)
-	) {
-		return {
-			response:
-				'Привет! Я ищу по ключевым фразам в документации. Спросите о прошивке, версиях, ошибках или попросите поделиться файлом.',
-			handled: true
-		}
-	}
-
-	if (
-		q.match(
-			/^(как дела|как ты|как жизнь|how are you|как настроение|как сам|как поживаешь|как оно|чё как|что нового)$/
-		)
-	) {
-		return {
-			response: 'У меня всё отлично! Я в форме и готов помочь с документацией',
-			handled: true
-		}
-	}
-
-	if (
-		q.match(
-			/^(что ты умеешь|как тебя использовать|что можешь|твои возможности|что ты можешь|как работать|помощь|help|функции|возможности|что делаешь|чем полезен)$/
-		)
-	) {
-		return {
-			response:
-				'Я умею искать документацию. Напишите модель и что нужно, например: "прошивка 5i", "версии 7.3", "техпаспорт 6", "файл прошивки 10"',
-			handled: true
-		}
-	}
-
-	if (
-		q.match(
-			/^(кто ты|ты кто|твое имя|как тебя зовут|представься|расскажи о себе|что ты)$/
-		)
-	) {
-		return {
-			response:
-				'Я POS-GPT — бот для поиска по документации Эвотор. Помогаю находить прошивки, версии и техпаспорта',
-			handled: true
-		}
-	}
-
-	if (
-		q.match(/^(спасибо|благодарю|thanks|thank you|спс|благодарствую|merci)$/)
-	) {
-		return {
-			response: 'Пожалуйста! Рад был помочь. Обращайтесь ещё',
-			handled: true
-		}
-	}
-
-	if (
-		q.match(
-			/^(пока|до свидания|goodbye|bye|прощай|увидимся|всего хорошего|до встречи)$/
-		)
-	) {
-		return {
-			response: 'До свидания! Буду на связи, если понадобится помощь',
-			handled: true
-		}
-	}
-
-	if (q.match(/^(извини|прости|sorry|пардон|виноват|извиняюсь)$/)) {
-		return {
-			response: 'Ничего страшного! Чем могу помочь?',
-			handled: true
-		}
-	}
-
-	if (q.match(/^(да|ага|ок|ok|хорошо|ладно|понял|ясно)$/)) {
-		return {
-			response:
-				'Отлично! Напишите, что нужно найти: модель, прошивку или версии',
-			handled: true
-		}
-	}
-
-	if (
-		q.match(/^(расскажи шутку|рассмеши|прикол|забавно|анекдот|пошути|смешно)$/)
-	) {
-		return {
-			response:
-				'Почему программисты путают Хэллоуин и Рождество? Потому что 31 Oct = 25 Dec! 😄',
-			handled: true
-		}
-	}
-
-	if (q.match(/^(ты крут|ты молодец|хороший бот|классный|умный|хвалю)$/)) {
-		return {
-			response: 'Спасибо! Стараюсь помогать как могу 😊',
-			handled: true
-		}
-	}
-
-	const badWords = [
-		'хуй',
-		'пизда',
-		'бля',
-		'уебан',
-		'нахуй',
-		'залупа',
-		'мудак',
-		'говно',
-		'дерьмо',
-		'сука',
-		'блять',
-		'хер',
-		'нахер',
-		'пиздец',
-		'ебать',
-		'заебал'
-	]
-	for (const word of badWords) {
-		if (q.includes(word)) {
-			return {
-				response:
-					'Давайте общаться культурно. Я помогу найти документацию, если скажете ключевую фразу по-человечески',
-				handled: true
-			}
-		}
-	}
-
-	return null
+// Проверка: есть ли в ключевом слове буквы (не только цифры)
+function hasLetters(word: string): boolean {
+	return /[а-яa-z]/i.test(word)
 }
 
 let cachedFiles: { path: string; content: string }[] | null = null
@@ -190,22 +35,53 @@ export async function GET(request: NextRequest) {
 	const rawQuery = searchParams.get('q')?.trim() || ''
 	const query = normalizeQuery(rawQuery)
 
-	if (!query) {
-		return NextResponse.json({ results: [] })
-	}
+	if (!query) return NextResponse.json({ results: [] })
 
-	const specialResponse = handleSpecialQueries(query)
-	if (specialResponse && specialResponse.handled) {
+	// Приветствия
+	const q = query.replace(/[!?.,;:]$/, '')
+	if (['привет', 'здравствуй', 'hi', 'hello', 'ку', 'дарова'].includes(q)) {
 		return NextResponse.json({
-			specialResponse: specialResponse.response,
+			specialResponse:
+				'Привет! Я ищу по ключевым фразам в документации. Спрашивай, не стесняйся!',
 			results: []
 		})
 	}
-
-	// Определяем тип запроса по ключевым словам
-	const hasFirmwareWord =
-		/прошивк|прошить|обновит|файл прошивки|firmware|update/i.test(rawQuery)
-	const hasErrorWord = /ошибк|код|error/i.test(rawQuery)
+	if (['как дела', 'как ты', 'как жизнь', 'как сам', 'чо как'].includes(q)) {
+		return NextResponse.json({
+			specialResponse: 'У меня всё отлично!',
+			results: []
+		})
+	}
+	if (
+		[
+			'что ты умеешь',
+			'помощь',
+			'help',
+			'функции',
+			'что можешь',
+			'расскажи о себе'
+		].includes(q)
+	) {
+		return NextResponse.json({
+			specialResponse:
+				'Я POS-GPT — бот для поиска по документации. Помогаю находить инструкции, коды ошибок, файлы прошивок и много чего ещё. Просто напиши, что нужно: "прошивка 5i", "ошибка 3924", "техпаспорт X5"',
+			results: []
+		})
+	}
+	if (['спасибо', 'благодарю', 'спс', 'мерси', 'благодарствую'].includes(q)) {
+		return NextResponse.json({
+			specialResponse: 'Всегда пожалуйста! Обращайся, если что',
+			results: []
+		})
+	}
+	if (
+		['пока', 'до свидания', 'goodbye', 'бывай', 'всего хорошего'].includes(q)
+	) {
+		return NextResponse.json({
+			specialResponse: 'Пока-пока! Буду на связи, если понадоблюсь',
+			results: []
+		})
+	}
 
 	const docsDir = path.join(process.cwd(), 'public/docs')
 
@@ -225,25 +101,6 @@ export async function GET(request: NextRequest) {
 			const relativePath = path.relative(docsDir, filePath)
 			const displayName = relativePath.replace(/\.txt$/, '')
 
-			// Определяем тип файла по содержимому
-			const isErrorFile =
-				fullContent.includes('КОД ОШИБКИ') ||
-				fullContent.includes('=== КОД ОШИБКИ ===')
-			const isFirmwareFile =
-				fullContent.includes('ПРОШИВКА') ||
-				fullContent.includes('прошивка') ||
-				fullContent.includes('=== МОДЕЛЬ:')
-
-			// Если запрос про прошивку - пропускаем файлы ошибок
-			if (hasFirmwareWord && isErrorFile) {
-				continue
-			}
-
-			// Если запрос про ошибку - пропускаем файлы прошивок
-			if (hasErrorWord && isFirmwareFile) {
-				continue
-			}
-
 			const keywordSectionIndex = fullContent.indexOf('--- КЛЮЧЕВЫЕ СЛОВА ---')
 			if (keywordSectionIndex === -1) continue
 
@@ -251,33 +108,24 @@ export async function GET(request: NextRequest) {
 				.substring(0, keywordSectionIndex)
 				.trim()
 
+			// Attachments
 			let attachments: { url: string; name: string }[] = []
-			const attachmentPatterns = [
-				'--- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---',
-				'--- ПРИЛОЖЕННЫЕ ФАЙЛЫ (ССЫЛКИ) ---'
-			]
-
-			for (const pattern of attachmentPatterns) {
-				const patternIndex = fullContent.indexOf(pattern)
-				if (patternIndex !== -1) {
-					let start = patternIndex + pattern.length
-					let end = fullContent.indexOf('---', start)
-					if (end === -1) end = fullContent.length
-
-					const sectionText = fullContent.substring(start, end)
-					const lines = sectionText.split('\n')
-
-					for (const line of lines) {
-						const colonIndex = line.indexOf(':')
-						if (colonIndex !== -1) {
-							const name = line.substring(0, colonIndex).trim()
-							const urlMatch = line.match(/https?:\/\/[^\s]+/)
-							if (urlMatch && name) {
-								attachments.push({ name, url: urlMatch[0] })
-							}
+			const attachmentPattern = fullContent.indexOf('--- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---')
+			if (attachmentPattern !== -1) {
+				let start = attachmentPattern + '--- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---'.length
+				let end = fullContent.indexOf('---', start)
+				if (end === -1) end = fullContent.length
+				const sectionText = fullContent.substring(start, end)
+				const lines = sectionText.split('\n')
+				for (const line of lines) {
+					const colonIndex = line.indexOf(':')
+					if (colonIndex !== -1) {
+						const name = line.substring(0, colonIndex).trim()
+						const urlMatch = line.match(/https?:\/\/[^\s]+/)
+						if (urlMatch && name) {
+							attachments.push({ name, url: urlMatch[0] })
 						}
 					}
-					break
 				}
 			}
 
@@ -296,37 +144,28 @@ export async function GET(request: NextRequest) {
 				.filter((line) => line.length > 0 && !line.includes('---'))
 
 			let isMatch = false
+			const isNumericQuery = /^\d+$/.test(query)
 
-			// Если запрос - короткое число (1-2 цифры)
-			if (/^\d{1,2}$/.test(query)) {
-				// Ищем точное совпадение в ключевых словах
-				if (keywords.includes(query)) {
-					isMatch = true
-				}
-			}
-			// Если запрос - длинное число (3-4 цифры)
-			else if (/^\d{3,4}$/.test(query)) {
-				for (const keyword of keywords) {
-					const numbers = keyword.match(/\d+/g)
-					if (numbers && numbers.includes(query)) {
+			for (const keyword of keywords) {
+				// Определяем тип ключевой фразы: есть буквы → текстовая, только цифры → числовая
+				const keywordHasLetters = hasLetters(keyword)
+				const keywordNumbers = keyword.match(/\d+/g)
+				const onlyNumber =
+					keywordNumbers && keywordNumbers[0] === keyword && !keywordHasLetters
+
+				if (isNumericQuery) {
+					// ЧИСЛОВОЙ ЗАПРОС (например, "5")
+					// Ищем только числовые ключевые фразы (только цифры, без букв)
+					if (onlyNumber && keyword === query) {
 						isMatch = true
 						break
 					}
-				}
-			}
-			// Текстовые запросы
-			else {
-				for (const keyword of keywords) {
-					if (query.length >= 3) {
-						if (query.includes(keyword) || keyword.includes(query)) {
-							isMatch = true
-							break
-						}
-					} else {
-						if (keyword === query) {
-							isMatch = true
-							break
-						}
+				} else {
+					// ТЕКСТОВЫЙ ЗАПРОС (например, "прошивка 5 ай")
+					// Ищем только текстовые ключевые фразы (с буквами)
+					if (keywordHasLetters && query.includes(keyword)) {
+						isMatch = true
+						break
 					}
 				}
 			}
@@ -335,15 +174,13 @@ export async function GET(request: NextRequest) {
 				results.push({
 					filename: displayName,
 					content: contentWithoutKeywords,
-					attachments: attachments
+					attachments
 				})
 			}
 		}
 
-		// Удаляем дубликаты по filename
 		const uniqueResults = results.filter(
-			(result, index, self) =>
-				index === self.findIndex((r) => r.filename === result.filename)
+			(r, i, self) => i === self.findIndex((t) => t.filename === r.filename)
 		)
 
 		return NextResponse.json({ results: uniqueResults })
