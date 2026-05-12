@@ -327,7 +327,7 @@ export default function Home() {
 				onClose={() => setIsInstructionsOpen(false)}
 			/>
 
-			<div className='flex flex-col h-screen bg-gray-900'>
+			<div className='flex flex-col h-dvh bg-gray-900'>
 				{/* Header */}
 				<div className='sticky top-0 bg-gray-800/90 backdrop-blur-md border-b border-gray-700/50 px-4 sm:px-6 py-3 z-10'>
 					<div className='max-w-3xl mx-auto flex items-center justify-between gap-2'>
@@ -496,7 +496,7 @@ export default function Home() {
 											type='button'
 											onClick={() => sendMessage(input)}
 											disabled={isLoading}
-											className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-600 text-white disabled:bg-gray-700 hover:bg-blue-500 transition-all flex items-center justify-center shrink-0'
+											className='w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blue-600 text-white disabled:bg-gray-700 hover:bg-blue-500 transition-all flex items-center justify-center shrink-0'
 										>
 											<svg
 												width='14'
@@ -514,7 +514,7 @@ export default function Home() {
 										<button
 											type='button'
 											onClick={() => setIsVoiceMode(true)}
-											className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-white transition-all flex items-center justify-center shrink-0'
+											className='w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-white transition-all flex items-center justify-center shrink-0'
 											title='Голосовой ввод'
 										>
 											<Mic size={'16px'} />
@@ -526,7 +526,7 @@ export default function Home() {
 										type='button'
 										onClick={() => sendMessage(input)}
 										disabled={isLoading || !input.trim()}
-										className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full transition-all flex items-center justify-center shrink-0 ${
+										className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full transition-all flex items-center justify-center shrink-0 ${
 											input.trim()
 												? 'bg-blue-600 text-white hover:bg-blue-500'
 												: 'bg-gray-700 text-gray-500 cursor-not-allowed'

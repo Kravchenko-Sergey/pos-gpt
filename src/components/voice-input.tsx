@@ -100,7 +100,9 @@ export default function VoiceInput({
 		setRecognition(recognitionInstance)
 	}
 
-	const startListening = () => {
+	const startListening = (e: React.MouseEvent | React.TouchEvent) => {
+		e.preventDefault()
+		e.stopPropagation()
 		if (!hasPermission) {
 			alert('Разрешите доступ к микрофону')
 			return
@@ -110,7 +112,9 @@ export default function VoiceInput({
 		}
 	}
 
-	const stopListening = () => {
+	const stopListening = (e: React.MouseEvent | React.TouchEvent) => {
+		e.preventDefault()
+		e.stopPropagation()
 		if (recognition && isListening) {
 			recognition.stop()
 		}
@@ -153,8 +157,8 @@ export default function VoiceInput({
 					fontFamily: 'inherit'
 				}}
 			>
-				<div className='py-2 flex items-center gap-2'>
-					<span className='truncate'>
+				<div className='py-1 flex items-center gap-2 w-full h-full'>
+					<span className='truncate flex-1'>
 						{isListening
 							? 'Отпустите, чтобы отправить'
 							: 'Удерживайте для голосового ввода'}
@@ -165,7 +169,7 @@ export default function VoiceInput({
 			<button
 				type='button'
 				onClick={() => onVoiceModeChange?.(false)}
-				className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-white transition-all flex items-center justify-center flex-shrink-0'
+				className='w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-white transition-all flex items-center justify-center shrink-0'
 				title='Вернуться к клавиатуре'
 			>
 				<Keyboard size={'16px'} />
