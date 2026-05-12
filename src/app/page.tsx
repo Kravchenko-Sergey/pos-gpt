@@ -460,68 +460,51 @@ export default function Home() {
 				</div>
 
 				{/* Input form - с поддержкой голосового ввода */}
-				<div className='px-3 sm:px-6 py-3 sm:py-5 bg-gray-800/95 backdrop-blur-md border-t border-gray-700'>
+				<div className='px-3 sm:px-6 py-3 sm:py-5 bg-gray-800/95 backdrop-blur-md border-t border-gray-700 max-h-17.75'>
 					<div className='max-w-3xl mx-auto'>
 						{/* Обычный режим - показываем текстовое поле и кнопки */}
 						{!isVoiceMode && (
-							<div className='flex gap-2 sm:gap-3 bg-gray-900 rounded-xl sm:rounded-2xl p-1 sm:p-1.5 pl-3 sm:pl-4 shadow-sm border border-gray-700 focus-within:border-blue-500 transition-all'>
-								<textarea
-									ref={textareaRef}
-									value={input}
-									onChange={(e) => setInput(e.target.value)}
-									onKeyDown={(e) => {
-										if (e.key === 'Enter' && !e.shiftKey) {
-											e.preventDefault()
-											handleSubmit(e)
-										}
-									}}
-									placeholder='Например: "прошивка 5i" или "ошибка 4119"'
-									rows={1}
-									className='flex-1 border-none outline-none resize-none py-1.5 sm:py-2 px-0 font-sans bg-transparent max-h-32 text-gray-200 placeholder:text-gray-500 focus:text-white text-xs sm:text-sm'
-									style={{ minHeight: '36px' }}
-								/>
+							<div className='flex items-center gap-2 sm:gap-3 w-full'>
+								{/* Инпут для ввода текста */}
+								<div className='flex-1 bg-gray-900 rounded-xl border border-gray-700 px-3 sm:px-4 py-1.5 sm:py-2 focus-within:border-blue-500 transition-all flex items-center'>
+									<textarea
+										ref={textareaRef}
+										value={input}
+										onChange={(e) => setInput(e.target.value)}
+										onKeyDown={(e) => {
+											if (e.key === 'Enter' && !e.shiftKey) {
+												e.preventDefault()
+												sendMessage(input)
+											}
+										}}
+										placeholder='Например: "прошивка 5i" или "ошибка 4119"'
+										rows={1}
+										className='py-2 w-full border-none outline-none resize-none font-sans bg-transparent text-gray-200 placeholder:text-gray-500 focus:text-white text-xs sm:text-sm text-center leading-normal'
+										style={{
+											minHeight: '24px',
+											height: 'auto',
+											lineHeight: '1.4'
+										}}
+									/>
+								</div>
 
-								{/* Кнопка голосового ввода - ТОЛЬКО на мобильных */}
-								{isMobile && !input.trim() && (
-									<button
-										type='button'
-										onClick={() => setIsVoiceMode(true)}
-										className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-white transition-all flex items-center justify-center flex-shrink-0'
-										title='Голосовой ввод'
-									>
-										<Mic size={'16px'} />
-									</button>
-								)}
+								{/* Кнопка голосового ввода - круглая, как кнопка выхода */}
+								<button
+									type='button'
+									onClick={() => setIsVoiceMode(true)}
+									className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-white transition-all flex items-center justify-center shrink-0'
+									title='Голосовой ввод'
+								>
+									<Mic size={'16px'} />
+								</button>
 
-								{/* Кнопка отправки - для ВСЕХ устройств, когда есть текст */}
+								{/* Кнопка отправки - показываем только если есть текст, заменяет кнопку микрофона */}
 								{input.trim() && (
 									<button
 										type='button'
 										onClick={() => sendMessage(input)}
 										disabled={isLoading}
-										className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-600 text-white disabled:bg-gray-700 disabled:opacity-50 hover:bg-green-500 transition-all flex items-center justify-center flex-shrink-0'
-									>
-										<svg
-											width='14'
-											height='14'
-											viewBox='0 0 24 24'
-											fill='none'
-											stroke='currentColor'
-											strokeWidth='2'
-										>
-											<line x1='12' y1='19' x2='12' y2='5' />
-											<polyline points='5 12 12 5 19 12' />
-										</svg>
-									</button>
-								)}
-
-								{/* Для ПК когда нет текста - показываем disabled кнопку */}
-								{!isMobile && !input.trim() && (
-									<button
-										type='button'
-										disabled={true}
-										className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-700 opacity-50 cursor-not-allowed flex items-center justify-center flex-shrink-0'
-										title='Введите текст для отправки'
+										className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-600 text-white disabled:bg-gray-700 hover:bg-green-500 transition-all flex items-center justify-center shrink-0'
 									>
 										<svg
 											width='14'
@@ -541,12 +524,14 @@ export default function Home() {
 
 						{/* Голосовой режим */}
 						{isVoiceMode && (
-							<VoiceInput
-								onTranscript={handleVoiceTranscript}
-								onVoiceModeChange={setIsVoiceMode}
-								disabled={isLoading}
-								isVoiceModeActive={isVoiceMode}
-							/>
+							<div className='flex gap-2 sm:gap-3 w-full'>
+								<VoiceInput
+									onTranscript={handleVoiceTranscript}
+									onVoiceModeChange={setIsVoiceMode}
+									disabled={isLoading}
+									isVoiceModeActive={isVoiceMode}
+								/>
+							</div>
 						)}
 					</div>
 				</div>

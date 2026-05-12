@@ -128,8 +128,8 @@ export default function VoiceInput({
 	}
 
 	return (
-		<div className='px-3 flex gap-2 sm:gap-3 w-full items-center'>
-			{/* Кнопка записи - такого же размера как input */}
+		<div className='flex items-center gap-2 sm:gap-3 w-full'>
+			{/* Кнопка стилизованная точно как input */}
 			<button
 				type='button'
 				onMouseDown={startListening}
@@ -140,30 +140,37 @@ export default function VoiceInput({
 				onTouchCancel={stopListening}
 				disabled={disabled}
 				className={`
-          flex-1 px-4 py-3.5 rounded-xl
-          transition-all duration-200
+          flex-1 px-4 py-1.5 sm:py-2 rounded-xl
+          transition-colors duration-200
+          text-left
           ${
 						isListening
-							? 'bg-red-500 text-white'
-							: 'bg-blue-600 text-white hover:bg-blue-500'
+							? 'bg-red-500/20 border-red-500 text-red-400'
+							: 'bg-gray-900 border-gray-700 text-gray-400 hover:bg-gray-800'
 					}
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-          flex items-center justify-center gap-2
-          text-xs sm:text-sm font-medium
+          border text-xs sm:text-sm
+          focus:outline-none focus:border-blue-500
         `}
+				style={{
+					minHeight: '36px',
+					fontFamily: 'inherit'
+				}}
 			>
-				{isListening ? (
-					<span>Отпустите, чтобы отправить</span>
-				) : (
-					<span>Удерживайте для голосового ввода</span>
-				)}
+				<div className='py-2 flex items-center gap-2'>
+					<span className='truncate'>
+						{isListening
+							? 'Отпустите, чтобы отправить'
+							: 'Удерживайте для голосового ввода'}
+					</span>
+				</div>
 			</button>
 
 			{/* Кнопка выхода из голосового режима */}
 			<button
 				type='button'
 				onClick={() => onVoiceModeChange?.(false)}
-				className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-white transition-all flex items-center justify-center shrink-0'
+				className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-white transition-all flex items-center justify-center flex-shrink-0'
 				title='Вернуться к клавиатуре'
 			>
 				<Keyboard size={'16px'} />
