@@ -21,9 +21,7 @@ export default function VoiceInput({
 	const [recognition, setRecognition] = useState<any>(null)
 	const [hasPermission, setHasPermission] = useState<boolean | null>(null)
 	const [isMobile, setIsMobile] = useState(false)
-	const longPressTimer = useRef<NodeJS.Timeout | null>(null)
 
-	// Проверка на мобильное устройство
 	useEffect(() => {
 		const checkDevice = () => {
 			const userAgent = navigator.userAgent.toLowerCase()
@@ -118,7 +116,6 @@ export default function VoiceInput({
 		}
 	}
 
-	// Если не мобильное устройство - не показываем компонент
 	if (!isMobile) {
 		return null
 	}
@@ -129,7 +126,6 @@ export default function VoiceInput({
 
 	return (
 		<div className='flex items-center gap-2 sm:gap-3 w-full'>
-			{/* Кнопка стилизованная точно как input */}
 			<button
 				type='button'
 				onMouseDown={startListening}
@@ -166,7 +162,6 @@ export default function VoiceInput({
 				</div>
 			</button>
 
-			{/* Кнопка выхода из голосового режима */}
 			<button
 				type='button'
 				onClick={() => onVoiceModeChange?.(false)}

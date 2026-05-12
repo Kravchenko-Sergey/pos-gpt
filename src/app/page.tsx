@@ -241,6 +241,20 @@ export default function Home() {
 		}
 	}, [input])
 
+	useEffect(() => {
+		const checkDevice = () => {
+			const userAgent = navigator.userAgent.toLowerCase()
+			const mobile =
+				/android|webos|iphone|ipad|ipod|blackberry|windows phone/i.test(
+					userAgent
+				)
+			const touchScreen =
+				'ontouchstart' in window || navigator.maxTouchPoints > 0
+			setIsMobile(mobile || touchScreen)
+		}
+		checkDevice()
+	}, [])
+
 	// Функция отправки сообщения
 	const sendMessage = async (messageText: string) => {
 		if (!messageText.trim() || isLoading) return
@@ -305,20 +319,6 @@ export default function Home() {
 			sendMessage(text)
 		}
 	}
-
-	useEffect(() => {
-		const checkDevice = () => {
-			const userAgent = navigator.userAgent.toLowerCase()
-			const mobile =
-				/android|webos|iphone|ipad|ipod|blackberry|windows phone/i.test(
-					userAgent
-				)
-			const touchScreen =
-				'ontouchstart' in window || navigator.maxTouchPoints > 0
-			setIsMobile(mobile || touchScreen)
-		}
-		checkDevice()
-	}, [])
 
 	return (
 		<>
@@ -460,7 +460,8 @@ export default function Home() {
 				</div>
 
 				{/* Input form - с поддержкой голосового ввода */}
-				<div className='px-3 sm:px-6 py-3 sm:py-5 bg-gray-800/95 backdrop-blur-md border-t border-gray-700 max-h-17.75'>
+				{/* Input form - с поддержкой голосового ввода */}
+				<div className='px-3 sm:px-6 py-3 sm:py-5 bg-gray-800/95 backdrop-blur-md border-t border-gray-700'>
 					<div className='max-w-3xl mx-auto'>
 						{/* Обычный режим - показываем текстовое поле и кнопки */}
 						{!isVoiceMode && (
@@ -479,7 +480,7 @@ export default function Home() {
 										}}
 										placeholder='Например: "прошивка 5i" или "ошибка 4119"'
 										rows={1}
-										className='py-2 w-full border-none outline-none resize-none font-sans bg-transparent text-gray-200 placeholder:text-gray-500 focus:text-white text-xs sm:text-sm text-center leading-normal'
+										className='w-full border-none outline-none resize-none font-sans bg-transparent text-gray-200 placeholder:text-gray-500 focus:text-white text-xs sm:text-sm leading-normal'
 										style={{
 											minHeight: '24px',
 											height: 'auto',
@@ -488,23 +489,48 @@ export default function Home() {
 									/>
 								</div>
 
-								{/* Кнопка голосового ввода - круглая, как кнопка выхода */}
-								<button
-									type='button'
-									onClick={() => setIsVoiceMode(true)}
-									className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-white transition-all flex items-center justify-center shrink-0'
-									title='Голосовой ввод'
-								>
-									<Mic size={'16px'} />
-								</button>
-
-								{/* Кнопка отправки - показываем только если есть текст, заменяет кнопку микрофона */}
-								{input.trim() && (
+								{/* На мобильных: кнопка микрофона или отправки */}
+								{isMobile ? (
+									input.trim() ? (
+										<button
+											type='button'
+											onClick={() => sendMessage(input)}
+											disabled={isLoading}
+											className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-600 text-white disabled:bg-gray-700 hover:bg-blue-500 transition-all flex items-center justify-center shrink-0'
+										>
+											<svg
+												width='14'
+												height='14'
+												viewBox='0 0 24 24'
+												fill='none'
+												stroke='currentColor'
+												strokeWidth='2'
+											>
+												<line x1='12' y1='19' x2='12' y2='5' />
+												<polyline points='5 12 12 5 19 12' />
+											</svg>
+										</button>
+									) : (
+										<button
+											type='button'
+											onClick={() => setIsVoiceMode(true)}
+											className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-white transition-all flex items-center justify-center shrink-0'
+											title='Голосовой ввод'
+										>
+											<Mic size={'16px'} />
+										</button>
+									)
+								) : (
+									/* На ПК: только кнопка отправки */
 									<button
 										type='button'
 										onClick={() => sendMessage(input)}
-										disabled={isLoading}
-										className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-600 text-white disabled:bg-gray-700 hover:bg-green-500 transition-all flex items-center justify-center shrink-0'
+										disabled={isLoading || !input.trim()}
+										className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full transition-all flex items-center justify-center shrink-0 ${
+											input.trim()
+												? 'bg-blue-600 text-white hover:bg-blue-500'
+												: 'bg-gray-700 text-gray-500 cursor-not-allowed'
+										}`}
 									>
 										<svg
 											width='14'
@@ -522,8 +548,8 @@ export default function Home() {
 							</div>
 						)}
 
-						{/* Голосовой режим */}
-						{isVoiceMode && (
+						{/* Голосовой режим - только на мобильных */}
+						{isVoiceMode && isMobile && (
 							<div className='flex gap-2 sm:gap-3 w-full'>
 								<VoiceInput
 									onTranscript={handleVoiceTranscript}
