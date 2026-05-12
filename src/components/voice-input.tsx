@@ -21,6 +21,7 @@ export default function VoiceInput({
 	const [recognition, setRecognition] = useState<any>(null)
 	const [hasPermission, setHasPermission] = useState<boolean | null>(null)
 	const [isMobile, setIsMobile] = useState(false)
+	const buttonRef = useRef<HTMLButtonElement>(null)
 
 	useEffect(() => {
 		const checkDevice = () => {
@@ -100,9 +101,7 @@ export default function VoiceInput({
 		setRecognition(recognitionInstance)
 	}
 
-	const startListening = (e: React.MouseEvent | React.TouchEvent) => {
-		e.preventDefault()
-		e.stopPropagation()
+	const startListening = () => {
 		if (!hasPermission) {
 			alert('Разрешите доступ к микрофону')
 			return
@@ -112,9 +111,7 @@ export default function VoiceInput({
 		}
 	}
 
-	const stopListening = (e: React.MouseEvent | React.TouchEvent) => {
-		e.preventDefault()
-		e.stopPropagation()
+	const stopListening = () => {
 		if (recognition && isListening) {
 			recognition.stop()
 		}
@@ -131,6 +128,7 @@ export default function VoiceInput({
 	return (
 		<div className='flex items-center gap-2 sm:gap-3 w-full'>
 			<button
+				ref={buttonRef}
 				type='button'
 				onMouseDown={startListening}
 				onMouseUp={stopListening}
@@ -140,9 +138,10 @@ export default function VoiceInput({
 				onTouchCancel={stopListening}
 				disabled={disabled}
 				className={`
-          flex-1 px-4 py-1.5 sm:py-2 rounded-xl
+          flex-1 px-4 py-2.5 sm:py-2 rounded-xl
           transition-colors duration-200
-          text-left
+          text-center
+          flex items-center justify-center
           ${
 						isListening
 							? 'bg-red-500/20 border-red-500 text-red-400'
@@ -154,22 +153,22 @@ export default function VoiceInput({
         `}
 				style={{
 					minHeight: '36px',
-					fontFamily: 'inherit'
+					fontFamily: 'inherit',
+					userSelect: 'none',
+					touchAction: 'none'
 				}}
 			>
-				<div className='py-1 flex items-center gap-2 w-full h-full'>
-					<span className='truncate flex-1'>
-						{isListening
-							? 'Отпустите, чтобы отправить'
-							: 'Удерживайте для голосового ввода'}
-					</span>
-				</div>
+				<span className='pointer-events-none'>
+					{isListening
+						? 'Отпустите, чтобы отправить'
+						: 'Удерживайте для голосового ввода'}
+				</span>
 			</button>
 
 			<button
 				type='button'
 				onClick={() => onVoiceModeChange?.(false)}
-				className='w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-white transition-all flex items-center justify-center shrink-0'
+				className='w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-white transition-all flex items-center justify-center flex-shrink-0'
 				title='Вернуться к клавиатуре'
 			>
 				<Keyboard size={'16px'} />
