@@ -2,7 +2,6 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import Link from 'next/link'
 import {
 	BookOpen,
 	Bot,
@@ -13,8 +12,10 @@ import {
 	XCircle,
 	Sparkles,
 	FileText,
-	Download
+	Download,
+	Mic
 } from 'lucide-react'
+import VoiceInput from '@/components/voice-input'
 
 type Message = {
 	role: 'user' | 'assistant'
@@ -63,7 +64,6 @@ function InstructionsModal({
 	return (
 		<div className='fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/70 backdrop-blur-sm animate-fadeIn'>
 			<div className='bg-gray-800 rounded-t-2xl sm:rounded-2xl border border-gray-700 max-w-2xl w-full max-h-[90vh] sm:max-h-[85vh] overflow-y-auto shadow-xl'>
-				{/* Заголовок */}
 				<div className='sticky top-0 bg-gray-800 border-b border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between'>
 					<h2 className='text-base sm:text-xl font-semibold text-white flex items-center gap-2'>
 						<BookOpen className='w-4 h-4 sm:w-5 sm:h-5 text-blue-400' />
@@ -79,9 +79,7 @@ function InstructionsModal({
 					</button>
 				</div>
 
-				{/* Контент */}
 				<div className='p-4 sm:p-6 space-y-4 sm:space-y-6'>
-					{/* Основные правила */}
 					<div>
 						<h3 className='text-base sm:text-lg font-medium text-blue-400 mb-2 sm:mb-3 flex items-center gap-2'>
 							<Sparkles className='w-3.5 h-3.5 sm:w-4 sm:h-4' />
@@ -114,18 +112,9 @@ function InstructionsModal({
 									конкретнее, тем лучше
 								</span>
 							</li>
-							<li className='flex items-start gap-2'>
-								<span className='text-blue-400 shrink-0'>•</span>
-								<span>
-									Не используйте слишком{' '}
-									<span className='text-blue-400 font-medium'>короткие</span>{' '}
-									запросы
-								</span>
-							</li>
 						</ul>
 					</div>
 
-					{/* Правильные запросы */}
 					<div>
 						<h3 className='text-base sm:text-lg font-medium text-green-400 mb-2 sm:mb-3 flex items-center gap-2'>
 							<CheckCircle className='w-3.5 h-3.5 sm:w-4 sm:h-4' />
@@ -139,11 +128,6 @@ function InstructionsModal({
 							</div>
 							<div className='bg-gray-900 rounded-lg p-2 sm:p-2.5 border border-gray-700'>
 								<code className='text-green-400 text-xs sm:text-sm'>
-									файл прошивки для эвотор 5i
-								</code>
-							</div>
-							<div className='bg-gray-900 rounded-lg p-2 sm:p-2.5 border border-gray-700'>
-								<code className='text-green-400 text-xs sm:text-sm'>
 									версии 7.3
 								</code>
 							</div>
@@ -152,15 +136,9 @@ function InstructionsModal({
 									техпаспорт 6
 								</code>
 							</div>
-							<div className='bg-gray-900 rounded-lg p-2 sm:p-2.5 border border-gray-700'>
-								<code className='text-green-400 text-xs sm:text-sm'>
-									как прошить эвотор 5i
-								</code>
-							</div>
 						</div>
 					</div>
 
-					{/* Неправильные запросы */}
 					<div>
 						<h3 className='text-base sm:text-lg font-medium text-red-400 mb-2 sm:mb-3 flex items-center gap-2'>
 							<XCircle className='w-3.5 h-3.5 sm:w-4 sm:h-4' />
@@ -178,21 +156,12 @@ function InstructionsModal({
 							<div className='bg-gray-900 rounded-lg p-2 sm:p-2.5 border border-gray-700'>
 								<code className='text-red-400 text-xs sm:text-sm'>5i</code>
 								<p className='text-gray-500 text-[11px] sm:text-xs mt-1'>
-									→ Не указан тип информации (прошивка, версии, техпаспорт)
-								</p>
-							</div>
-							<div className='bg-gray-900 rounded-lg p-2 sm:p-2.5 border border-gray-700'>
-								<code className='text-red-400 text-xs sm:text-sm'>
-									скинь прошивку
-								</code>
-								<p className='text-gray-500 text-[11px] sm:text-xs mt-1'>
-									→ Нет модели, непонятно какой терминал
+									→ Не указан тип информации
 								</p>
 							</div>
 						</div>
 					</div>
 
-					{/* Доступные модели */}
 					<div>
 						<h3 className='text-base sm:text-lg font-medium text-purple-400 mb-2 sm:mb-3 flex items-center gap-2'>
 							<FileText className='w-3.5 h-3.5 sm:w-4 sm:h-4' />
@@ -217,42 +186,17 @@ function InstructionsModal({
 						</div>
 					</div>
 
-					{/* Что можно найти */}
-					<div>
-						<h3 className='text-base sm:text-lg font-medium text-blue-400 mb-2 sm:mb-3 flex items-center gap-2'>
-							<Download className='w-3.5 h-3.5 sm:w-4 sm:h-4' />
-							<span>Что можно найти</span>
-						</h3>
-						<div className='flex flex-wrap gap-1.5 sm:gap-2'>
-							<span className='px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-900 rounded-lg text-xs sm:text-sm text-gray-300 flex items-center gap-1 sm:gap-1.5 border border-gray-700'>
-								📦 Прошивка
-							</span>
-							<span className='px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-900 rounded-lg text-xs sm:text-sm text-gray-300 flex items-center gap-1 sm:gap-1.5 border border-gray-700'>
-								📋 Версии
-							</span>
-							<span className='px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-900 rounded-lg text-xs sm:text-sm text-gray-300 flex items-center gap-1 sm:gap-1.5 border border-gray-700'>
-								📄 Техпаспорт
-							</span>
-							<span className='px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-900 rounded-lg text-xs sm:text-sm text-gray-300 flex items-center gap-1 sm:gap-1.5 border border-gray-700'>
-								🔗 Ссылки
-							</span>
-						</div>
-					</div>
-
-					{/* Полезный совет */}
 					<div className='bg-blue-600/10 border border-blue-500/30 rounded-xl p-3 sm:p-4'>
 						<p className='text-xs sm:text-sm text-blue-300 flex items-start gap-2'>
 							<Sparkles className='w-3.5 h-3.5 sm:w-4 sm:h-4 mt-0.5 shrink-0' />
 							<span>
-								<span className='font-medium'>Совет:</span> Если не уверены в
-								запросе, просто напишите модель и что хотите узнать. Например:
-								"прошивка 5i" или "версии 7.3"
+								<span className='font-medium'>Совет:</span> Например: "прошивка
+								5i" или "версии 7.3"
 							</span>
 						</p>
 					</div>
 				</div>
 
-				{/* Кнопка закрытия внизу */}
 				<div className='border-t border-gray-700 px-4 sm:px-6 py-3 sm:py-4 bg-gray-800/50'>
 					<button
 						onClick={onClose}
@@ -277,8 +221,10 @@ export default function Home() {
 	const [input, setInput] = useState('')
 	const [isLoading, setIsLoading] = useState(false)
 	const [isInstructionsOpen, setIsInstructionsOpen] = useState(false)
+	const [isVoiceMode, setIsVoiceMode] = useState(false)
 	const messagesEndRef = useRef<HTMLDivElement>(null)
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
+	const [isMobile, setIsMobile] = useState(false)
 
 	const scrollToBottom = () => {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -295,18 +241,17 @@ export default function Home() {
 		}
 	}, [input])
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault()
-		if (!input.trim() || isLoading) return
+	// Функция отправки сообщения
+	const sendMessage = async (messageText: string) => {
+		if (!messageText.trim() || isLoading) return
 
-		const userMessage = input.trim()
+		setMessages((prev) => [...prev, { role: 'user', content: messageText }])
 		setInput('')
-		setMessages((prev) => [...prev, { role: 'user', content: userMessage }])
 		setIsLoading(true)
 
 		try {
 			const response = await fetch(
-				`/api/search?q=${encodeURIComponent(userMessage)}`
+				`/api/search?q=${encodeURIComponent(messageText)}`
 			)
 			const data = await response.json()
 
@@ -331,7 +276,7 @@ export default function Home() {
 					...prev,
 					{
 						role: 'assistant',
-						content: `Ничего не нашёл по запросу "${userMessage}".\n\n Попробуйте:\n• Указать модель (5i, 6, 7.3, 10)\n• Указать тип (прошивка, ошибка, версии)\n• Написать короче и точнее`
+						content: `Ничего не нашёл по запросу "${messageText}".\n\nПопробуйте:\n• Указать модель (5i, 6, 7.3, 10)\n• Указать тип (прошивка, ошибка, версии)\n• Написать короче и точнее`
 					}
 				])
 			}
@@ -348,6 +293,33 @@ export default function Home() {
 		}
 	}
 
+	// Обработчик отправки формы
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+		await sendMessage(input)
+	}
+
+	// Обработчик голосового ввода
+	const handleVoiceTranscript = (text: string) => {
+		if (text.trim()) {
+			sendMessage(text)
+		}
+	}
+
+	useEffect(() => {
+		const checkDevice = () => {
+			const userAgent = navigator.userAgent.toLowerCase()
+			const mobile =
+				/android|webos|iphone|ipad|ipod|blackberry|windows phone/i.test(
+					userAgent
+				)
+			const touchScreen =
+				'ontouchstart' in window || navigator.maxTouchPoints > 0
+			setIsMobile(mobile || touchScreen)
+		}
+		checkDevice()
+	}, [])
+
 	return (
 		<>
 			<InstructionsModal
@@ -359,7 +331,6 @@ export default function Home() {
 				{/* Header */}
 				<div className='sticky top-0 bg-gray-800/90 backdrop-blur-md border-b border-gray-700/50 px-4 sm:px-6 py-3 z-10'>
 					<div className='max-w-3xl mx-auto flex items-center justify-between gap-2'>
-						{/* Логотип */}
 						<div className='flex items-center gap-2 shrink-0'>
 							<Bot className='w-5 h-5 sm:w-6 sm:h-6 text-blue-400' />
 							<span className='text-base sm:text-xl font-semibold text-white'>
@@ -367,9 +338,7 @@ export default function Home() {
 							</span>
 						</div>
 
-						{/* Кнопки - на мобилках текст скрыт, только иконки */}
 						<div className='flex items-center gap-1 sm:gap-1.5'>
-							{/* Флешка */}
 							<a
 								href='https://disk.yandex.ru/d/pBGRrxepfXG-yw'
 								target='_blank'
@@ -381,7 +350,6 @@ export default function Home() {
 								<span className='hidden sm:inline'>Флешка</span>
 							</a>
 
-							{/* Таблица */}
 							<a
 								href='https://cloud.atm72.ru/s/7wtH9HYb74DLrCt'
 								target='_blank'
@@ -393,7 +361,6 @@ export default function Home() {
 								<span className='hidden sm:inline'>Таблица</span>
 							</a>
 
-							{/* Инструкция */}
 							<button
 								onClick={() => setIsInstructionsOpen(true)}
 								className='group flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white transition-all duration-200 text-xs sm:text-sm font-medium border border-blue-500/30 hover:border-blue-400'
@@ -492,51 +459,97 @@ export default function Home() {
 					</div>
 				</div>
 
-				{/* Input form */}
-				<form
-					onSubmit={handleSubmit}
-					className='px-3 sm:px-6 py-3 sm:py-5 bg-gray-800/95 backdrop-blur-md border-t border-gray-700'
-				>
+				{/* Input form - с поддержкой голосового ввода */}
+				<div className='px-3 sm:px-6 py-3 sm:py-5 bg-gray-800/95 backdrop-blur-md border-t border-gray-700'>
 					<div className='max-w-3xl mx-auto'>
-						<div className='flex gap-2 sm:gap-3 bg-gray-900 rounded-xl sm:rounded-2xl p-1 sm:p-1.5 pl-3 sm:pl-4 shadow-sm border border-gray-700 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all'>
-							<textarea
-								ref={textareaRef}
-								value={input}
-								onChange={(e) => setInput(e.target.value)}
-								onKeyDown={(e) => {
-									if (e.key === 'Enter' && !e.shiftKey) {
-										e.preventDefault()
-										handleSubmit(e)
-									}
-								}}
-								placeholder='Например: "прошивка 5i" или "ошибка 4119"'
-								rows={1}
-								className='flex-1 border-none outline-none resize-none py-1.5 sm:py-2 px-0 font-sans bg-transparent max-h-32 sm:max-h-50 text-gray-200 placeholder:text-gray-500 focus:text-white text-xs sm:text-sm'
-								style={{ lineHeight: '1.4' }}
+						{/* Обычный режим - показываем текстовое поле и кнопки */}
+						{!isVoiceMode && (
+							<div className='flex gap-2 sm:gap-3 bg-gray-900 rounded-xl sm:rounded-2xl p-1 sm:p-1.5 pl-3 sm:pl-4 shadow-sm border border-gray-700 focus-within:border-blue-500 transition-all'>
+								<textarea
+									ref={textareaRef}
+									value={input}
+									onChange={(e) => setInput(e.target.value)}
+									onKeyDown={(e) => {
+										if (e.key === 'Enter' && !e.shiftKey) {
+											e.preventDefault()
+											handleSubmit(e)
+										}
+									}}
+									placeholder='Например: "прошивка 5i" или "ошибка 4119"'
+									rows={1}
+									className='flex-1 border-none outline-none resize-none py-1.5 sm:py-2 px-0 font-sans bg-transparent max-h-32 text-gray-200 placeholder:text-gray-500 focus:text-white text-xs sm:text-sm'
+									style={{ minHeight: '36px' }}
+								/>
+
+								{/* Кнопка голосового ввода - ТОЛЬКО на мобильных */}
+								{isMobile && !input.trim() && (
+									<button
+										type='button'
+										onClick={() => setIsVoiceMode(true)}
+										className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-white transition-all flex items-center justify-center flex-shrink-0'
+										title='Голосовой ввод'
+									>
+										<Mic size={'16px'} />
+									</button>
+								)}
+
+								{/* Кнопка отправки - для ВСЕХ устройств, когда есть текст */}
+								{input.trim() && (
+									<button
+										type='button'
+										onClick={() => sendMessage(input)}
+										disabled={isLoading}
+										className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-green-600 text-white disabled:bg-gray-700 disabled:opacity-50 hover:bg-green-500 transition-all flex items-center justify-center flex-shrink-0'
+									>
+										<svg
+											width='14'
+											height='14'
+											viewBox='0 0 24 24'
+											fill='none'
+											stroke='currentColor'
+											strokeWidth='2'
+										>
+											<line x1='12' y1='19' x2='12' y2='5' />
+											<polyline points='5 12 12 5 19 12' />
+										</svg>
+									</button>
+								)}
+
+								{/* Для ПК когда нет текста - показываем disabled кнопку */}
+								{!isMobile && !input.trim() && (
+									<button
+										type='button'
+										disabled={true}
+										className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-700 opacity-50 cursor-not-allowed flex items-center justify-center flex-shrink-0'
+										title='Введите текст для отправки'
+									>
+										<svg
+											width='14'
+											height='14'
+											viewBox='0 0 24 24'
+											fill='none'
+											stroke='currentColor'
+											strokeWidth='2'
+										>
+											<line x1='12' y1='19' x2='12' y2='5' />
+											<polyline points='5 12 12 5 19 12' />
+										</svg>
+									</button>
+								)}
+							</div>
+						)}
+
+						{/* Голосовой режим */}
+						{isVoiceMode && (
+							<VoiceInput
+								onTranscript={handleVoiceTranscript}
+								onVoiceModeChange={setIsVoiceMode}
+								disabled={isLoading}
+								isVoiceModeActive={isVoiceMode}
 							/>
-							<button
-								type='submit'
-								disabled={isLoading || !input.trim()}
-								className='w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-600 text-white disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed hover:bg-blue-500 transition-all duration-200 flex items-center justify-center shrink-0 shadow-md'
-							>
-								<svg
-									width='14'
-									height='14'
-									viewBox='0 0 24 24'
-									fill='none'
-									stroke='currentColor'
-									strokeWidth='2'
-									strokeLinecap='round'
-									strokeLinejoin='round'
-									className='sm:w-4.5 sm:h-4.5'
-								>
-									<line x1='12' y1='19' x2='12' y2='5' />
-									<polyline points='5 12 12 5 19 12' />
-								</svg>
-							</button>
-						</div>
+						)}
 					</div>
-				</form>
+				</div>
 
 				<style jsx global>{`
 					@keyframes fadeIn {
