@@ -449,7 +449,7 @@ export default function Home() {
 											{/* Кнопки для текстовых сообщений ассистента */}
 											{/* Кнопки для текстовых сообщений ассистента - пропускаем приветственное сообщение (индекс 0) */}
 											{message.role === 'assistant' && idx !== 0 && (
-												<div className='absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1'>
+												<div className='absolute -top-2 -right-2 flex gap-1'>
 													<button
 														onClick={() =>
 															copyToClipboard(message.content!, `msg-${idx}`)
@@ -464,13 +464,6 @@ export default function Home() {
 														)}
 													</button>
 													<button
-														onClick={() => shareContent(message.content!)}
-														className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg'
-														title='Поделиться'
-													>
-														<Share2 size={12} />
-													</button>
-													<button
 														onClick={() =>
 															downloadText(
 																message.content!,
@@ -481,6 +474,13 @@ export default function Home() {
 														title='Скачать'
 													>
 														<Download size={12} />
+													</button>
+													<button
+														onClick={() => shareContent(message.content!)}
+														className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg'
+														title='Поделиться'
+													>
+														<Share2 size={12} />
 													</button>
 												</div>
 											)}
@@ -504,7 +504,7 @@ export default function Home() {
 													)}
 
 													{/* Кнопки для файлов */}
-													<div className='absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1'>
+													<div className='absolute top-2 right-2 flex gap-1'>
 														<button
 															onClick={() =>
 																copyToClipboard(
