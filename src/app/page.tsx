@@ -77,7 +77,7 @@ function InstructionsModal({
 					</h2>
 					<button
 						onClick={onClose}
-						className='w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-white transition-colors flex items-center justify-center'
+						className='w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-white transition-colors flex items-center justify-center cursor-pointer'
 					>
 						<X className='w-3.5 h-3.5 sm:w-4 sm:h-4' />
 					</button>
@@ -204,7 +204,7 @@ function InstructionsModal({
 				<div className='border-t border-gray-700 px-4 sm:px-6 py-3 sm:py-4 bg-gray-800/50'>
 					<button
 						onClick={onClose}
-						className='w-full py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-colors font-medium flex items-center justify-center gap-2 text-sm sm:text-base'
+						className='w-full py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-colors font-medium flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer'
 					>
 						<span>Понятно, спасибо</span>
 					</button>
@@ -436,7 +436,7 @@ export default function Home() {
 
 							<button
 								onClick={() => setIsInstructionsOpen(true)}
-								className='group flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white transition-all duration-200 text-xs sm:text-sm font-medium border border-blue-500/30 hover:border-blue-400'
+								className='group flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white transition-all duration-200 text-xs sm:text-sm font-medium border border-blue-500/30 hover:border-blue-400 cursor-pointer'
 								title='Инструкция'
 							>
 								<BookOpen className='w-3.5 h-3.5' />
@@ -484,7 +484,7 @@ export default function Home() {
 														onClick={() =>
 															copyToClipboard(message.content!, `msg-${idx}`)
 														}
-														className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg'
+														className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg cursor-pointer'
 														title='Копировать'
 													>
 														{copiedId === `msg-${idx}` ? (
@@ -495,7 +495,7 @@ export default function Home() {
 													</button>
 													<button
 														onClick={() => shareContent(message.content!)}
-														className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg'
+														className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg cursor-pointer'
 														title='Поделиться'
 													>
 														<Share2 size={12} />
@@ -507,7 +507,7 @@ export default function Home() {
 																`pos-gpt-answer-${Date.now()}.txt`
 															)
 														}
-														className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg'
+														className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg cursor-pointer'
 														title='Скачать'
 													>
 														<Download size={12} />
@@ -541,7 +541,7 @@ export default function Home() {
 																	`file-${idx}-${fileIdx}`
 																)
 															}
-															className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg'
+															className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg cursor-pointer'
 															title='Копировать'
 														>
 															{copiedId === `file-${idx}-${fileIdx}` ? (
@@ -552,7 +552,7 @@ export default function Home() {
 														</button>
 														<button
 															onClick={() => shareContent(file.content)}
-															className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg'
+															className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg cursor-pointer'
 															title='Поделиться'
 														>
 															<Share2 size={12} />
@@ -564,7 +564,7 @@ export default function Home() {
 																	`pos-gpt-${file.filename || 'document'}-${Date.now()}.txt`
 																)
 															}
-															className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg'
+															className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg cursor-pointer'
 															title='Скачать'
 														>
 															<Download size={12} />
@@ -619,7 +619,7 @@ export default function Home() {
 				{showScrollButton && (
 					<button
 						onClick={scrollToBottomClick}
-						className='fixed bottom-20 right-3 sm:bottom-26 sm:right-6 z-20 p-2.5 sm:p-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg transition-all duration-200 animate-fadeIn'
+						className='fixed bottom-20 right-3 sm:bottom-26 sm:right-6 z-20 p-2.5 sm:p-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg transition-all duration-200 animate-fadeIn cursor-pointer'
 						title='Вниз'
 					>
 						<ChevronDown size={16} />
