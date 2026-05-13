@@ -402,7 +402,6 @@ export default function Home() {
 
 			<div className='flex flex-col h-dvh bg-gray-900'>
 				{/* Header */}
-
 				<div className='shrink-0 sticky top-0 bg-gray-800/90 backdrop-blur-md border-b border-gray-700/50 px-4 sm:px-6 py-3 z-10'>
 					<div className='max-w-3xl mx-auto flex items-center justify-between gap-2'>
 						<div className='flex items-center gap-2 shrink-0'>
@@ -418,7 +417,7 @@ export default function Home() {
 								target='_blank'
 								rel='noopener noreferrer'
 								className='group flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg bg-gray-700/50 hover:bg-gray-700 text-gray-400 hover:text-white transition-all duration-200 text-xs sm:text-sm font-medium border border-gray-600/50 hover:border-gray-500'
-								title='Флешка инженра'
+								title='Флешка инженера'
 							>
 								<ExternalLink className='w-3.5 h-3.5' />
 								<span className='hidden sm:inline'>Флешка</span>
@@ -498,13 +497,6 @@ export default function Home() {
 															)}
 														</button>
 														<button
-															onClick={() => shareContent(message.content!)}
-															className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg cursor-pointer'
-															title='Поделиться'
-														>
-															<Share2 size={12} />
-														</button>
-														<button
 															onClick={() =>
 																downloadText(
 																	message.content!,
@@ -515,6 +507,13 @@ export default function Home() {
 															title='Скачать'
 														>
 															<Download size={12} />
+														</button>
+														<button
+															onClick={() => shareContent(message.content!)}
+															className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg cursor-pointer'
+															title='Поделиться'
+														>
+															<Share2 size={12} />
 														</button>
 													</div>
 												)}
@@ -555,13 +554,6 @@ export default function Home() {
 															)}
 														</button>
 														<button
-															onClick={() => shareContent(file.content)}
-															className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg cursor-pointer'
-															title='Поделиться'
-														>
-															<Share2 size={12} />
-														</button>
-														<button
 															onClick={() =>
 																downloadText(
 																	file.content,
@@ -572,6 +564,13 @@ export default function Home() {
 															title='Скачать'
 														>
 															<Download size={12} />
+														</button>
+														<button
+															onClick={() => shareContent(file.content)}
+															className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg cursor-pointer'
+															title='Поделиться'
+														>
+															<Share2 size={12} />
 														</button>
 													</div>
 
@@ -623,11 +622,10 @@ export default function Home() {
 				{showScrollButton && (
 					<button
 						onClick={scrollToBottomClick}
-						className='fixed right-4 sm:right-6 z-20 p-2.5 sm:p-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg transition-all duration-200 animate-fadeIn cursor-pointer'
-						style={{ bottom: '80px' }}
+						className='fixed bottom-20 sm:bottom-26 right-3 sm:right-6 z-20 p-2.5 sm:p-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg transition-all duration-200 animate-fadeIn cursor-pointer'
 						title='Вниз'
 					>
-						<ChevronDown size={18} />
+						<ChevronDown size={16} />
 					</button>
 				)}
 
