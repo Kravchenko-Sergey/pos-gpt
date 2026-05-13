@@ -12,11 +12,12 @@ import {
 	XCircle,
 	Sparkles,
 	FileText,
+	Download,
 	Mic,
 	Copy,
 	Share2,
 	Check,
-	Download
+	ChevronDown
 } from 'lucide-react'
 import VoiceInput from '@/components/voice-input'
 
@@ -229,10 +230,37 @@ export default function Home() {
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 	const [isMobile, setIsMobile] = useState(false)
 	const [copiedId, setCopiedId] = useState<string | null>(null)
+	const [showScrollButton, setShowScrollButton] = useState(false)
+	const chatContainerRef = useRef<HTMLDivElement>(null)
 
 	const scrollToBottom = () => {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
 	}
+
+	const handleScroll = () => {
+		if (chatContainerRef.current) {
+			const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current
+			const isNearBottom = scrollHeight - scrollTop - clientHeight < 100
+			setShowScrollButton(!isNearBottom)
+		}
+	}
+
+	const scrollToBottomClick = () => {
+		if (chatContainerRef.current) {
+			chatContainerRef.current.scrollTo({
+				top: chatContainerRef.current.scrollHeight,
+				behavior: 'smooth'
+			})
+		}
+	}
+
+	useEffect(() => {
+		const container = chatContainerRef.current
+		if (container) {
+			container.addEventListener('scroll', handleScroll)
+			return () => container.removeEventListener('scroll', handleScroll)
+		}
+	}, [])
 
 	useEffect(() => {
 		scrollToBottom()
@@ -258,6 +286,47 @@ export default function Home() {
 		}
 		checkDevice()
 	}, [])
+
+	// Функция копирования текста
+	const copyToClipboard = async (text: string, id: string) => {
+		try {
+			await navigator.clipboard.writeText(text)
+			setCopiedId(id)
+			setTimeout(() => setCopiedId(null), 2000)
+		} catch (err) {
+			console.error('Ошибка копирования:', err)
+		}
+	}
+
+	// Функция шеринга
+	const shareContent = async (text: string) => {
+		if (navigator.share) {
+			try {
+				await navigator.share({
+					title: 'POS GPT - Ответ',
+					text: text
+				})
+			} catch (err) {
+				console.error('Ошибка шеринга:', err)
+			}
+		} else {
+			await navigator.clipboard.writeText(text)
+			alert('Текст скопирован в буфер обмена')
+		}
+	}
+
+	// Функция скачивания текста в файл
+	const downloadText = (text: string, filename: string) => {
+		const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
+		const link = document.createElement('a')
+		const url = URL.createObjectURL(blob)
+		link.href = url
+		link.download = filename
+		document.body.appendChild(link)
+		link.click()
+		document.body.removeChild(link)
+		URL.revokeObjectURL(url)
+	}
 
 	// Функция отправки сообщения
 	const sendMessage = async (messageText: string) => {
@@ -324,47 +393,6 @@ export default function Home() {
 		}
 	}
 
-	// Функция копирования текста
-	const copyToClipboard = async (text: string, id: string) => {
-		try {
-			await navigator.clipboard.writeText(text)
-			setCopiedId(id)
-			setTimeout(() => setCopiedId(null), 2000)
-		} catch (err) {
-			console.error('Ошибка копирования:', err)
-		}
-	}
-
-	// Функция шеринга
-	const shareContent = async (text: string) => {
-		if (navigator.share) {
-			try {
-				await navigator.share({
-					title: 'POS GPT - Ответ',
-					text: text
-				})
-			} catch (err) {
-				console.error('Ошибка шеринга:', err)
-			}
-		} else {
-			// Если Web Share API не поддерживается, просто копируем
-			await navigator.clipboard.writeText(text)
-			alert('Текст скопирован в буфер обмена')
-		}
-	}
-
-	const downloadText = (text: string, filename: string) => {
-		const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
-		const link = document.createElement('a')
-		const url = URL.createObjectURL(blob)
-		link.href = url
-		link.download = filename
-		document.body.appendChild(link)
-		link.click()
-		document.body.removeChild(link)
-		URL.revokeObjectURL(url)
-	}
-
 	return (
 		<>
 			<InstructionsModal
@@ -419,7 +447,11 @@ export default function Home() {
 				</div>
 
 				{/* Messages */}
-				<div className='flex-1 overflow-y-auto px-2 sm:px-6 py-4 sm:py-8'>
+				<div
+					ref={chatContainerRef}
+					onScroll={handleScroll}
+					className='flex-1 overflow-y-auto px-2 sm:px-6 py-4 sm:py-8'
+				>
 					<div className='max-w-3xl mx-auto space-y-3 sm:space-y-4'>
 						{messages.map((message, idx) => (
 							<div
@@ -433,7 +465,6 @@ export default function Home() {
 										message.role === 'user' ? 'order-1' : ''
 									}`}
 								>
-									{/* Обычное текстовое сообщение */}
 									{message.content && (
 										<div className='relative group'>
 											<div
@@ -446,7 +477,6 @@ export default function Home() {
 												{renderContentWithLinks(message.content)}
 											</div>
 
-											{/* Кнопки для текстовых сообщений ассистента */}
 											{/* Кнопки для текстовых сообщений ассистента - пропускаем приветственное сообщение (индекс 0) */}
 											{message.role === 'assistant' && idx !== 0 && (
 												<div className='absolute -top-2 -right-2 flex gap-1'>
@@ -464,6 +494,13 @@ export default function Home() {
 														)}
 													</button>
 													<button
+														onClick={() => shareContent(message.content!)}
+														className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg'
+														title='Поделиться'
+													>
+														<Share2 size={12} />
+													</button>
+													<button
 														onClick={() =>
 															downloadText(
 																message.content!,
@@ -475,19 +512,11 @@ export default function Home() {
 													>
 														<Download size={12} />
 													</button>
-													<button
-														onClick={() => shareContent(message.content!)}
-														className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg'
-														title='Поделиться'
-													>
-														<Share2 size={12} />
-													</button>
 												</div>
 											)}
 										</div>
 									)}
 
-									{/* Файлы (результаты поиска) */}
 									{message.files && message.files.length > 0 && (
 										<div className='mt-2 sm:mt-3 space-y-2 sm:space-y-3'>
 											{message.files.map((file, fileIdx) => (
@@ -522,6 +551,13 @@ export default function Home() {
 															)}
 														</button>
 														<button
+															onClick={() => shareContent(file.content)}
+															className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg'
+															title='Поделиться'
+														>
+															<Share2 size={12} />
+														</button>
+														<button
 															onClick={() =>
 																downloadText(
 																	file.content,
@@ -533,16 +569,8 @@ export default function Home() {
 														>
 															<Download size={12} />
 														</button>
-														<button
-															onClick={() => shareContent(file.content)}
-															className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg'
-															title='Поделиться'
-														>
-															<Share2 size={12} />
-														</button>
 													</div>
 
-													{/* Ссылки на вложения */}
 													{file.attachments && file.attachments.length > 0 && (
 														<div className='px-3 sm:px-4 py-2 sm:py-3 bg-gray-800/50 border-t border-gray-700'>
 															<div className='flex flex-wrap gap-1.5 sm:gap-2'>
@@ -586,6 +614,17 @@ export default function Home() {
 						<div ref={messagesEndRef} />
 					</div>
 				</div>
+
+				{/* Кнопка прокрутки вниз */}
+				{showScrollButton && (
+					<button
+						onClick={scrollToBottomClick}
+						className='fixed bottom-20 right-3 sm:bottom-26 sm:right-6 z-20 p-2.5 sm:p-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg transition-all duration-200 animate-fadeIn'
+						title='Вниз'
+					>
+						<ChevronDown size={16} />
+					</button>
+				)}
 
 				{/* Input form - с поддержкой голосового ввода */}
 				<div className='px-3 sm:px-6 py-3 sm:py-5 bg-gray-800/95 backdrop-blur-md border-t border-gray-700'>
