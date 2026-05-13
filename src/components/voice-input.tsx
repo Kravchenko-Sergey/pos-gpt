@@ -86,7 +86,6 @@ export default function VoiceInput({
 			if (finalTranscript) {
 				onTranscript(finalTranscript)
 				setIsListening(false)
-				onVoiceModeChange?.(false)
 			}
 		}
 
