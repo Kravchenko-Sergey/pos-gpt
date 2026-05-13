@@ -12,8 +12,11 @@ import {
 	XCircle,
 	Sparkles,
 	FileText,
-	Download,
-	Mic
+	Mic,
+	Copy,
+	Share2,
+	Check,
+	Download
 } from 'lucide-react'
 import VoiceInput from '@/components/voice-input'
 
@@ -225,6 +228,7 @@ export default function Home() {
 	const messagesEndRef = useRef<HTMLDivElement>(null)
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 	const [isMobile, setIsMobile] = useState(false)
+	const [copiedId, setCopiedId] = useState<string | null>(null)
 
 	const scrollToBottom = () => {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -320,6 +324,47 @@ export default function Home() {
 		}
 	}
 
+	// Функция копирования текста
+	const copyToClipboard = async (text: string, id: string) => {
+		try {
+			await navigator.clipboard.writeText(text)
+			setCopiedId(id)
+			setTimeout(() => setCopiedId(null), 2000)
+		} catch (err) {
+			console.error('Ошибка копирования:', err)
+		}
+	}
+
+	// Функция шеринга
+	const shareContent = async (text: string) => {
+		if (navigator.share) {
+			try {
+				await navigator.share({
+					title: 'POS GPT - Ответ',
+					text: text
+				})
+			} catch (err) {
+				console.error('Ошибка шеринга:', err)
+			}
+		} else {
+			// Если Web Share API не поддерживается, просто копируем
+			await navigator.clipboard.writeText(text)
+			alert('Текст скопирован в буфер обмена')
+		}
+	}
+
+	const downloadText = (text: string, filename: string) => {
+		const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
+		const link = document.createElement('a')
+		const url = URL.createObjectURL(blob)
+		link.href = url
+		link.download = filename
+		document.body.appendChild(link)
+		link.click()
+		document.body.removeChild(link)
+		URL.revokeObjectURL(url)
+	}
+
 	return (
 		<>
 			<InstructionsModal
@@ -388,24 +433,67 @@ export default function Home() {
 										message.role === 'user' ? 'order-1' : ''
 									}`}
 								>
+									{/* Обычное текстовое сообщение */}
 									{message.content && (
-										<div
-											className={`px-3 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm leading-relaxed ${
-												message.role === 'user'
-													? 'bg-blue-600 text-white rounded-br-sm'
-													: 'bg-gray-800 text-gray-100 rounded-bl-sm border border-gray-700'
-											}`}
-										>
-											{renderContentWithLinks(message.content)}
+										<div className='relative group'>
+											<div
+												className={`px-3 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm leading-relaxed ${
+													message.role === 'user'
+														? 'bg-blue-600 text-white rounded-br-sm'
+														: 'bg-gray-800 text-gray-100 rounded-bl-sm border border-gray-700'
+												}`}
+											>
+												{renderContentWithLinks(message.content)}
+											</div>
+
+											{/* Кнопки для текстовых сообщений ассистента */}
+											{/* Кнопки для текстовых сообщений ассистента - пропускаем приветственное сообщение (индекс 0) */}
+											{message.role === 'assistant' && idx !== 0 && (
+												<div className='absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1'>
+													<button
+														onClick={() =>
+															copyToClipboard(message.content!, `msg-${idx}`)
+														}
+														className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg'
+														title='Копировать'
+													>
+														{copiedId === `msg-${idx}` ? (
+															<Check size={12} className='text-green-400' />
+														) : (
+															<Copy size={12} />
+														)}
+													</button>
+													<button
+														onClick={() => shareContent(message.content!)}
+														className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg'
+														title='Поделиться'
+													>
+														<Share2 size={12} />
+													</button>
+													<button
+														onClick={() =>
+															downloadText(
+																message.content!,
+																`pos-gpt-answer-${Date.now()}.txt`
+															)
+														}
+														className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg'
+														title='Скачать'
+													>
+														<Download size={12} />
+													</button>
+												</div>
+											)}
 										</div>
 									)}
 
+									{/* Файлы (результаты поиска) */}
 									{message.files && message.files.length > 0 && (
 										<div className='mt-2 sm:mt-3 space-y-2 sm:space-y-3'>
 											{message.files.map((file, fileIdx) => (
 												<div
 													key={fileIdx}
-													className='bg-gray-800 rounded-lg sm:rounded-xl overflow-hidden border border-gray-700 hover:border-gray-600 transition-all'
+													className='bg-gray-800 rounded-lg sm:rounded-xl overflow-hidden border border-gray-700 hover:border-gray-600 transition-all relative group'
 												>
 													{file.content && (
 														<div className='p-3 sm:p-4 bg-gray-900/30'>
@@ -415,6 +503,46 @@ export default function Home() {
 														</div>
 													)}
 
+													{/* Кнопки для файлов */}
+													<div className='absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1'>
+														<button
+															onClick={() =>
+																copyToClipboard(
+																	file.content,
+																	`file-${idx}-${fileIdx}`
+																)
+															}
+															className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg'
+															title='Копировать'
+														>
+															{copiedId === `file-${idx}-${fileIdx}` ? (
+																<Check size={12} className='text-green-400' />
+															) : (
+																<Copy size={12} />
+															)}
+														</button>
+														<button
+															onClick={() =>
+																downloadText(
+																	file.content,
+																	`pos-gpt-${file.filename || 'document'}-${Date.now()}.txt`
+																)
+															}
+															className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg'
+															title='Скачать'
+														>
+															<Download size={12} />
+														</button>
+														<button
+															onClick={() => shareContent(file.content)}
+															className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg'
+															title='Поделиться'
+														>
+															<Share2 size={12} />
+														</button>
+													</div>
+
+													{/* Ссылки на вложения */}
 													{file.attachments && file.attachments.length > 0 && (
 														<div className='px-3 sm:px-4 py-2 sm:py-3 bg-gray-800/50 border-t border-gray-700'>
 															<div className='flex flex-wrap gap-1.5 sm:gap-2'>
@@ -459,7 +587,6 @@ export default function Home() {
 					</div>
 				</div>
 
-				{/* Input form - с поддержкой голосового ввода */}
 				{/* Input form - с поддержкой голосового ввода */}
 				<div className='px-3 sm:px-6 py-3 sm:py-5 bg-gray-800/95 backdrop-blur-md border-t border-gray-700'>
 					<div className='max-w-3xl mx-auto'>
