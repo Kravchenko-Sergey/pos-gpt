@@ -402,7 +402,8 @@ export default function Home() {
 
 			<div className='flex flex-col h-dvh bg-gray-900'>
 				{/* Header */}
-				<div className='sticky top-0 bg-gray-800/90 backdrop-blur-md border-b border-gray-700/50 px-4 sm:px-6 py-3 z-10'>
+
+				<div className='shrink-0 sticky top-0 bg-gray-800/90 backdrop-blur-md border-b border-gray-700/50 px-4 sm:px-6 py-3 z-10'>
 					<div className='max-w-3xl mx-auto flex items-center justify-between gap-2'>
 						<div className='flex items-center gap-2 shrink-0'>
 							<Bot className='w-5 h-5 sm:w-6 sm:h-6 text-blue-400' />
@@ -417,7 +418,7 @@ export default function Home() {
 								target='_blank'
 								rel='noopener noreferrer'
 								className='group flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg bg-gray-700/50 hover:bg-gray-700 text-gray-400 hover:text-white transition-all duration-200 text-xs sm:text-sm font-medium border border-gray-600/50 hover:border-gray-500'
-								title='Флешка'
+								title='Флешка инженра'
 							>
 								<ExternalLink className='w-3.5 h-3.5' />
 								<span className='hidden sm:inline'>Флешка</span>
@@ -428,7 +429,7 @@ export default function Home() {
 								target='_blank'
 								rel='noopener noreferrer'
 								className='group flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg bg-gray-700/50 hover:bg-gray-700 text-gray-400 hover:text-white transition-all duration-200 text-xs sm:text-sm font-medium border border-gray-600/50 hover:border-gray-500'
-								title='Таблица версий'
+								title='Таблица целевых версий'
 							>
 								<Table className='w-3.5 h-3.5' />
 								<span className='hidden sm:inline'>Таблица</span>
@@ -437,7 +438,7 @@ export default function Home() {
 							<button
 								onClick={() => setIsInstructionsOpen(true)}
 								className='group flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white transition-all duration-200 text-xs sm:text-sm font-medium border border-blue-500/30 hover:border-blue-400 cursor-pointer'
-								title='Инструкция'
+								title='Как задавать вопросы'
 							>
 								<BookOpen className='w-3.5 h-3.5' />
 								<span className='hidden sm:inline'>Инструкция</span>
@@ -447,6 +448,7 @@ export default function Home() {
 				</div>
 
 				{/* Messages */}
+
 				<div
 					ref={chatContainerRef}
 					onScroll={handleScroll}
@@ -478,42 +480,44 @@ export default function Home() {
 											</div>
 
 											{/* Кнопки для текстовых сообщений ассистента - пропускаем приветственное сообщение (индекс 0) */}
-											{message.role === 'assistant' && idx !== 0 && (
-												<div className='absolute -top-2 -right-2 flex gap-1'>
-													<button
-														onClick={() =>
-															copyToClipboard(message.content!, `msg-${idx}`)
-														}
-														className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg cursor-pointer'
-														title='Копировать'
-													>
-														{copiedId === `msg-${idx}` ? (
-															<Check size={12} className='text-green-400' />
-														) : (
-															<Copy size={12} />
-														)}
-													</button>
-													<button
-														onClick={() => shareContent(message.content!)}
-														className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg cursor-pointer'
-														title='Поделиться'
-													>
-														<Share2 size={12} />
-													</button>
-													<button
-														onClick={() =>
-															downloadText(
-																message.content!,
-																`pos-gpt-answer-${Date.now()}.txt`
-															)
-														}
-														className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg cursor-pointer'
-														title='Скачать'
-													>
-														<Download size={12} />
-													</button>
-												</div>
-											)}
+											{message.role === 'assistant' &&
+												idx !== 0 &&
+												!message.content?.startsWith('Ничего не нашёл') && (
+													<div className='absolute -top-2 -right-2 flex gap-1'>
+														<button
+															onClick={() =>
+																copyToClipboard(message.content!, `msg-${idx}`)
+															}
+															className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg cursor-pointer'
+															title='Копировать'
+														>
+															{copiedId === `msg-${idx}` ? (
+																<Check size={12} className='text-green-400' />
+															) : (
+																<Copy size={12} />
+															)}
+														</button>
+														<button
+															onClick={() => shareContent(message.content!)}
+															className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg cursor-pointer'
+															title='Поделиться'
+														>
+															<Share2 size={12} />
+														</button>
+														<button
+															onClick={() =>
+																downloadText(
+																	message.content!,
+																	`pos-gpt-answer-${Date.now()}.txt`
+																)
+															}
+															className='p-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors shadow-lg cursor-pointer'
+															title='Скачать'
+														>
+															<Download size={12} />
+														</button>
+													</div>
+												)}
 										</div>
 									)}
 
@@ -619,15 +623,17 @@ export default function Home() {
 				{showScrollButton && (
 					<button
 						onClick={scrollToBottomClick}
-						className='fixed bottom-20 right-3 sm:bottom-26 sm:right-6 z-20 p-2.5 sm:p-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg transition-all duration-200 animate-fadeIn cursor-pointer'
+						className='fixed right-4 sm:right-6 z-20 p-2.5 sm:p-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white shadow-lg transition-all duration-200 animate-fadeIn cursor-pointer'
+						style={{ bottom: '80px' }}
 						title='Вниз'
 					>
-						<ChevronDown size={16} />
+						<ChevronDown size={18} />
 					</button>
 				)}
 
 				{/* Input form - с поддержкой голосового ввода */}
-				<div className='px-3 sm:px-6 py-3 sm:py-5 bg-gray-800/95 backdrop-blur-md border-t border-gray-700'>
+
+				<div className='shrink-0 px-3 sm:px-6 py-3 sm:py-5 bg-gray-800/95 backdrop-blur-md border-t border-gray-700'>
 					<div className='max-w-3xl mx-auto'>
 						{/* Обычный режим - показываем текстовое поле и кнопки */}
 						{!isVoiceMode && (
@@ -646,6 +652,7 @@ export default function Home() {
 										}}
 										placeholder='Например: "прошивка 5i" или "ошибка 4119"'
 										rows={1}
+										maxLength={40}
 										className='w-full border-none outline-none resize-none font-sans bg-transparent text-gray-200 placeholder:text-gray-500 focus:text-white text-xs sm:text-sm leading-normal'
 										style={{
 											minHeight: '24px',
@@ -694,7 +701,7 @@ export default function Home() {
 										disabled={isLoading || !input.trim()}
 										className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full transition-all flex items-center justify-center shrink-0 ${
 											input.trim()
-												? 'bg-blue-600 text-white hover:bg-blue-500'
+												? 'bg-blue-600 text-white hover:bg-blue-500 cursor-pointer'
 												: 'bg-gray-700 text-gray-500 cursor-not-allowed'
 										}`}
 									>
