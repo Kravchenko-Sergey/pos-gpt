@@ -5,8 +5,8 @@
 ЧТО ПОНАДОБИТСЯ ДЛЯ ПРОШИВКИ:
 
 1. Флешка, отформатированная в FAT32
-2. Файл прошивки (актуальная версия 4.9.11)
-   Ссылка на скачивание: https://disk.yandex.ru/d/6wPk2ywVHz_BpA
+2. Файл прошивки (актуальная версия 4.9.12)
+   Ссылка на скачивание: https://tms-updates.evotor.ru/device/updates/cdn/repo/ce52fd43-f86c-48d7-be26-4b4d0573aaf2
 
 ПРОЦЕСС ПРОШИВКИ ПОШАГОВО:
 
@@ -32,4 +32,4 @@
 как прошить эвотор 7.3
 
 --- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---
-Файл прошивки: https://disk.yandex.ru/d/6wPk2ywVHz_BpA
+Файл прошивки: https://tms-updates.evotor.ru/device/updates/cdn/repo/ce52fd43-f86c-48d7-be26-4b4d0573aaf2

@@ -288,9 +288,21 @@ export default function Home() {
 	}, [])
 
 	// Функция копирования текста
-	const copyToClipboard = async (text: string, id: string) => {
+	const copyToClipboard = async (
+		text: string,
+		id: string,
+		attachments?: { url: string; name: string }[]
+	) => {
 		try {
-			await navigator.clipboard.writeText(text)
+			let copyText = text
+			// Если есть attachments, добавляем их в конец
+			if (attachments && attachments.length > 0) {
+				copyText += '\n\n--- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---\n'
+				attachments.forEach((att) => {
+					copyText += `${att.name}: ${att.url}\n`
+				})
+			}
+			await navigator.clipboard.writeText(copyText)
 			setCopiedId(id)
 			setTimeout(() => setCopiedId(null), 2000)
 		} catch (err) {

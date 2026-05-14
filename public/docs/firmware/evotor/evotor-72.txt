@@ -4,12 +4,12 @@
 
 ЧТО ПОНАДОБИТСЯ:
 1. Флешка, отформатированная в FAT32
-2. Файл прошивки: https://disk.yandex.ru/d/Zwk1HO1llawQwQ
+2. Файл прошивки: https://tms-updates.evotor.ru/device/updates/cdn/repo/186d84ad-bf39-4dd0-a70f-843fef42f0fc
 
 ПРОЦЕСС ПРОШИВКИ ПОШАГОВО:
 
-Шаг 1: Скачайте файл прошивки (актуальная версия 4.9.11)
-   Ссылка: https://disk.yandex.ru/d/Zwk1HO1llawQwQ
+Шаг 1: Скачайте файл прошивки (актуальная версия 4.9.12)
+   Ссылка: https://tms-updates.evotor.ru/device/updates/cdn/repo/186d84ad-bf39-4dd0-a70f-843fef42f0fc
 
 Шаг 2: Подготовьте флешку FAT32 и запишите файл прошивки в корень
 
