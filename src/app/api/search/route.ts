@@ -103,11 +103,12 @@ export async function GET(request: NextRequest) {
 			const keywordSectionIndex = fullContent.indexOf('--- КЛЮЧЕВЫЕ СЛОВА ---')
 			if (keywordSectionIndex === -1) continue
 
-			const contentWithoutKeywords = fullContent
+			// Берём весь текст ДО секции ключевых слов
+			let contentWithoutKeywords = fullContent
 				.substring(0, keywordSectionIndex)
 				.trim()
 
-			// Attachments
+			// Извлекаем приложенные файлы из секции --- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---
 			let attachments: { url: string; name: string }[] = []
 			const attachmentPattern = fullContent.indexOf('--- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---')
 			if (attachmentPattern !== -1) {
@@ -126,8 +127,17 @@ export async function GET(request: NextRequest) {
 						}
 					}
 				}
+
+				// Добавляем приложенные файлы в content для отображения
+				if (attachments.length > 0) {
+					contentWithoutKeywords += '\n\n--- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---\n'
+					for (const att of attachments) {
+						contentWithoutKeywords += `${att.name}: ${att.url}\n`
+					}
+				}
 			}
 
+			// Извлекаем ключевые слова
 			const afterKeywordSection = fullContent.substring(
 				keywordSectionIndex + '--- КЛЮЧЕВЫЕ СЛОВА ---'.length
 			)
@@ -142,6 +152,7 @@ export async function GET(request: NextRequest) {
 				.map((line) => line.trim().toLowerCase())
 				.filter((line) => line.length > 0 && !line.includes('---'))
 
+			// Проверяем соответствие запроса
 			let isMatch = false
 			const isNumericQuery = /^\d+$/.test(query)
 
