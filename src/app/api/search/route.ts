@@ -128,13 +128,8 @@ export async function GET(request: NextRequest) {
 					}
 				}
 
-				// ВОЗВРАЩАЕМ: добавляем приложенные файлы в content для отображения
-				if (attachments.length > 0) {
-					contentWithoutKeywords += '\n\n--- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---\n'
-					for (const att of attachments) {
-						contentWithoutKeywords += `${att.name}: ${att.url}\n`
-					}
-				}
+				// НЕ добавляем приложенные файлы в content - они будут только в attachments
+				// Этот блок полностью удалён
 			}
 
 			// Извлекаем ключевые слова
