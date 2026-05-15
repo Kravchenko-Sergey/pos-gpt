@@ -435,7 +435,7 @@ export default function Home() {
 												>
 													{file.content && (
 														<div className='p-3 sm:p-4 bg-gray-900/30'>
-															<div className='text-xs sm:text-sm leading-relaxed whitespace-pre-wrap text-gray-300'>
+															<div className='text-sm sm:text-base leading-relaxed whitespace-pre-wrap text-gray-300'>
 																{renderContentWithLinks(file.content)}
 															</div>
 														</div>
@@ -450,7 +450,7 @@ export default function Home() {
 																		href={attachment.url}
 																		target='_blank'
 																		rel='noopener noreferrer'
-																		className='inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-700 text-green-400 rounded-lg text-[11px] sm:text-xs hover:bg-gray-600 hover:text-green-300 transition-all'
+																		className='inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-700 text-green-400 rounded-lg text-sm sm:text-base hover:bg-gray-600 hover:text-green-300 transition-all'
 																	>
 																		📁 {attachment.name}
 																	</a>
@@ -468,9 +468,6 @@ export default function Home() {
 
 						{isLoading && (
 							<div className='flex gap-2 sm:gap-3 justify-start animate-fadeIn'>
-								<div className='w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center bg-blue-600 shadow-sm'>
-									<span className='text-sm sm:text-base'>🤖</span>
-								</div>
 								<div className='bg-gray-800 rounded-xl sm:rounded-2xl rounded-bl-sm px-3 sm:px-4 py-2 sm:py-3 border border-gray-700'>
 									<div className='flex gap-1'>
 										<span className='w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-blue-400 animate-bounce [animation-delay:-0.3s]'></span>
