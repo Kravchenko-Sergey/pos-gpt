@@ -78,116 +78,157 @@ function InstructionsModal({
 				</div>
 
 				<div className='p-4 sm:p-6 space-y-4 sm:space-y-6'>
+					{/* Как работает поиск */}
 					<div>
 						<h3 className='text-base sm:text-lg font-medium text-blue-400 mb-2 sm:mb-3 flex items-center gap-2'>
 							<Sparkles className='w-3.5 h-3.5 sm:w-4 sm:h-4' />
-							<span>Основные правила</span>
+							<span>Как работает поиск</span>
 						</h3>
 						<ul className='space-y-1.5 sm:space-y-2 text-gray-300 text-xs sm:text-sm'>
 							<li className='flex items-start gap-2'>
 								<span className='text-blue-400 shrink-0'>•</span>
 								<span>
-									Указывайте{' '}
-									<span className='text-blue-400 font-medium'>модель</span> —
-									5i, 6, 7.2, 7.3, 10
-								</span>
-							</li>
-							<li className='flex items-start gap-2'>
-								<span className='text-blue-400 shrink-0'>•</span>
-								<span>
-									Указывайте{' '}
+									Поиск идёт по{' '}
 									<span className='text-blue-400 font-medium'>
-										тип информации
+										ключевым словам
 									</span>{' '}
-									— прошивка, версии, техпаспорт, файл
+									в файлах документации
 								</span>
 							</li>
 							<li className='flex items-start gap-2'>
 								<span className='text-blue-400 shrink-0'>•</span>
 								<span>
-									Формулируйте{' '}
-									<span className='text-blue-400 font-medium'>точно</span> — чем
-									конкретнее, тем лучше
+									Чем{' '}
+									<span className='text-blue-400 font-medium'>
+										точнее запрос
+									</span>{' '}
+									— тем лучше результат
 								</span>
 							</li>
 						</ul>
 					</div>
 
+					{/* Что можно найти */}
 					<div>
 						<h3 className='text-base sm:text-lg font-medium text-green-400 mb-2 sm:mb-3 flex items-center gap-2'>
-							<span>Примеры правильных запросов</span>
+							<span>Что можно найти</span>
+						</h3>
+						<div className='flex flex-wrap gap-1.5 sm:gap-2 mb-3'>
+							<span className='px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-900 text-green-400 rounded-lg text-xs sm:text-sm border border-green-500/30'>
+								Инструкции
+							</span>
+							<span className='px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-900 text-green-400 rounded-lg text-xs sm:text-sm border border-green-500/30'>
+								Прошивки
+							</span>
+							<span className='px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-900 text-green-400 rounded-lg text-xs sm:text-sm border border-green-500/30'>
+								Регформы
+							</span>
+							<span className='px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-900 text-green-400 rounded-lg text-xs sm:text-sm border border-green-500/30'>
+								Техпаспорта
+							</span>
+							<span className='px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-900 text-green-400 rounded-lg text-xs sm:text-sm border border-green-500/30'>
+								Коды ошибок
+							</span>
+						</div>
+					</div>
+
+					{/* Примеры правильных запросов */}
+					<div>
+						<h3 className='text-base sm:text-lg font-medium text-green-400 mb-2 sm:mb-3 flex items-center gap-2'>
+							<span>✅ Примеры правильных запросов</span>
 						</h3>
 						<div className='space-y-1.5 sm:space-y-2'>
 							<div className='bg-gray-900 rounded-lg p-2 sm:p-2.5 border border-gray-700'>
 								<code className='text-green-400 text-xs sm:text-sm'>
-									прошивка 5i
+									Установка P10
 								</code>
 							</div>
 							<div className='bg-gray-900 rounded-lg p-2 sm:p-2.5 border border-gray-700'>
 								<code className='text-green-400 text-xs sm:text-sm'>
-									версии 7.3
+									Прошивка 5i
 								</code>
 							</div>
 							<div className='bg-gray-900 rounded-lg p-2 sm:p-2.5 border border-gray-700'>
 								<code className='text-green-400 text-xs sm:text-sm'>
-									техпаспорт 6
+									Регформа ИКР
+								</code>
+							</div>
+							<div className='bg-gray-900 rounded-lg p-2 sm:p-2.5 border border-gray-700'>
+								<code className='text-green-400 text-xs sm:text-sm'>
+									Техпаспорт X5
+								</code>
+							</div>
+							<div className='bg-gray-900 rounded-lg p-2 sm:p-2.5 border border-gray-700'>
+								<code className='text-green-400 text-xs sm:text-sm'>
+									Ошибка 4119
 								</code>
 							</div>
 						</div>
 					</div>
 
+					{/* Примеры неправильных запросов */}
 					<div>
 						<h3 className='text-base sm:text-lg font-medium text-red-400 mb-2 sm:mb-3 flex items-center gap-2'>
-							<span>Примеры неправильных запросов</span>
+							<span>❌ Примеры неправильных запросов</span>
 						</h3>
 						<div className='space-y-1.5 sm:space-y-2'>
 							<div className='bg-gray-900 rounded-lg p-2 sm:p-2.5 border border-gray-700'>
 								<code className='text-red-400 text-xs sm:text-sm'>
-									прошивка
+									терминал
 								</code>
 								<p className='text-gray-500 text-[11px] sm:text-xs mt-1'>
-									→ Слишком общий запрос, непонятно для какой модели
+									→ Слишком общий запрос, непонятно какой терминал
 								</p>
 							</div>
 							<div className='bg-gray-900 rounded-lg p-2 sm:p-2.5 border border-gray-700'>
-								<code className='text-red-400 text-xs sm:text-sm'>5i</code>
+								<code className='text-red-400 text-xs sm:text-sm'>
+									настройка
+								</code>
 								<p className='text-gray-500 text-[11px] sm:text-xs mt-1'>
-									→ Не указан тип информации
+									→ Не указана модель или тип подключения
 								</p>
 							</div>
 						</div>
 					</div>
 
+					{/* Доступные модели терминалов */}
 					<div>
 						<h3 className='text-base sm:text-lg font-medium text-purple-400 mb-2 sm:mb-3 flex items-center gap-2'>
 							<FileText className='w-3.5 h-3.5 sm:w-4 sm:h-4' />
-							<span>Доступные модели</span>
+							<span>Доступные модели терминалов</span>
 						</h3>
 						<div className='flex flex-wrap gap-1.5 sm:gap-2'>
 							<span className='px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-900 text-purple-400 rounded-lg text-xs sm:text-sm font-mono border border-purple-500/30'>
-								5i
+								Эвотор 5i/6/7.2/7.3/10
 							</span>
 							<span className='px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-900 text-purple-400 rounded-lg text-xs sm:text-sm font-mono border border-purple-500/30'>
-								6
+								Kozen P10/P12
 							</span>
 							<span className='px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-900 text-purple-400 rounded-lg text-xs sm:text-sm font-mono border border-purple-500/30'>
-								7.2
+								Pax/S80/S90/D230/S300/SP30/Q25
 							</span>
 							<span className='px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-900 text-purple-400 rounded-lg text-xs sm:text-sm font-mono border border-purple-500/30'>
-								7.3
+								Tactilion T2/G3
 							</span>
 							<span className='px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-900 text-purple-400 rounded-lg text-xs sm:text-sm font-mono border border-purple-500/30'>
-								10
+								Verifone VX520/VX820
+							</span>
+							<span className='px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-900 text-purple-400 rounded-lg text-xs sm:text-sm font-mono border border-purple-500/30'>
+								Ingenico iCT220/IPP320/IWL320
+							</span>
+							<span className='px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-900 text-purple-400 rounded-lg text-xs sm:text-sm font-mono border border-purple-500/30'>
+								Castles VEGA3000
 							</span>
 						</div>
 					</div>
 
+					{/* Совет */}
 					<div className='bg-blue-600/10 border border-blue-500/30 rounded-xl p-3 sm:p-4'>
 						<p className='text-xs sm:text-sm text-blue-300 flex items-start gap-2'>
 							<Sparkles className='w-3.5 h-3.5 sm:w-4 sm:h-4 mt-0.5 shrink-0' />
 							<span>
-								<span className='font-medium'>Совет:</span> Например: "прошивка
-								5i" или "версии 7.3"
+								<span className='font-medium'></span> Чётко указывайте, что
+								нужно. Чем точнее запрос — тем быстрее найдём!
 							</span>
 						</p>
 					</div>
