@@ -147,12 +147,10 @@ export default function VoiceInput({
 							: 'bg-gray-900 border-gray-700 text-gray-400 hover:bg-gray-800'
 					}
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-          border text-xs sm:text-sm
+          border text-sm
           focus:outline-none focus:border-blue-500
         `}
 				style={{
-					minHeight: '36px',
-					fontFamily: 'inherit',
 					userSelect: 'none',
 					touchAction: 'none'
 				}}
@@ -160,7 +158,7 @@ export default function VoiceInput({
 				<span className='pointer-events-none'>
 					{isListening
 						? 'Отпустите, чтобы отправить'
-						: 'Удерживайте для голосового ввода'}
+						: 'Удерживайте, чтобы говорить'}
 				</span>
 			</button>
 

@@ -513,15 +513,11 @@ export default function Home() {
 												sendMessage(input)
 											}
 										}}
-										placeholder='Например: "прошивка 5i" или "ошибка 4119"'
+										placeholder='Введите сообщение ...'
 										rows={1}
 										maxLength={40}
-										className='w-full border-none outline-none resize-none font-sans bg-transparent text-gray-200 placeholder:text-gray-500 focus:text-white text-xs sm:text-sm leading-normal'
-										style={{
-											minHeight: '24px',
-											height: 'auto',
-											lineHeight: '1.4'
-										}}
+										className=' py-1 sm:py-0.5 w-full border-none outline-none resize-none font-sans bg-transparent text-sm'
+										
 									/>
 								</div>
 
