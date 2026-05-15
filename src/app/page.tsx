@@ -416,7 +416,7 @@ export default function Home() {
 								>
 									{message.content && (
 										<div
-											className={`px-3 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm leading-relaxed ${
+											className={`px-3 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-sm sm:text-base leading-relaxed ${
 												message.role === 'user'
 													? 'bg-blue-600 text-white rounded-br-sm'
 													: 'bg-gray-800 text-gray-100 rounded-bl-sm border border-gray-700'
@@ -503,23 +503,22 @@ export default function Home() {
 						{!isVoiceMode && (
 							<div className='flex items-center gap-2 sm:gap-3 w-full'>
 								<div className='flex-1 bg-gray-900 rounded-xl border border-gray-700 px-3 sm:px-4 py-1.5 sm:py-2 focus-within:border-blue-500 transition-all flex items-center'>
-									<textarea
-										ref={textareaRef}
-										value={input}
-										onChange={(e) => setInput(e.target.value)}
-										onKeyDown={(e) => {
-											if (e.key === 'Enter' && !e.shiftKey) {
-												e.preventDefault()
-												sendMessage(input)
-											}
-										}}
-										placeholder='Введите сообщение ...'
-										rows={1}
-										maxLength={40}
-										className=' py-1 sm:py-0.5 w-full border-none outline-none resize-none font-sans bg-transparent text-sm'
-										
-									/>
-								</div>
+	<textarea
+		ref={textareaRef}
+		value={input}
+		onChange={(e) => setInput(e.target.value)}
+		onKeyDown={(e) => {
+			if (e.key === 'Enter' && !e.shiftKey) {
+				e.preventDefault()
+				sendMessage(input)
+			}
+		}}
+		placeholder='Введите сообщение ...'
+		rows={1}
+		maxLength={40}
+		className='py-1 sm:py-0.5 w-full border-none outline-none resize-none font-sans bg-transparent text-sm sm-text-base text-white placeholder:text-gray-500'
+	/>
+</div>
 
 								{isMobile ? (
 									input.trim() ? (
