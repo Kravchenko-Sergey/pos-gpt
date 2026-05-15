@@ -355,7 +355,7 @@ export default function Home() {
 					<div className='max-w-3xl mx-auto flex items-center justify-between gap-2'>
 						<div className='flex items-center gap-2 shrink-0'>
 							<Bot className='w-5 h-5 sm:w-6 sm:h-6 text-blue-400' />
-							<span className='text-base sm:text-xl font-semibold text-white'>
+							<span className='text-lg sm:text-2xl font-semibold text-white'>
 								POS GPT
 							</span>
 						</div>
