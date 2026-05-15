@@ -10,7 +10,8 @@ import {
 	Sparkles,
 	FileText,
 	Mic,
-	ChevronDown
+	ChevronDown,
+	Paperclip
 } from 'lucide-react'
 import VoiceInput from '@/components/voice-input'
 
@@ -450,9 +451,12 @@ export default function Home() {
 																		href={attachment.url}
 																		target='_blank'
 																		rel='noopener noreferrer'
-																		className='inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-700 text-green-400 rounded-lg text-sm sm:text-base hover:bg-gray-600 hover:text-green-300 transition-all'
+																		className='inline-flex items-start gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-700 text-green-400 rounded-lg text-sm sm:text-base hover:bg-gray-600 hover:text-green-300 transition-all break-all whitespace-normal max-w-full'
 																	>
-																		📁 {attachment.name}
+																		<Paperclip className='w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 mt-0.5 text-gray-400' />
+																		<span className='break-all'>
+																			{attachment.name}
+																		</span>
 																	</a>
 																))}
 															</div>
@@ -500,22 +504,22 @@ export default function Home() {
 						{!isVoiceMode && (
 							<div className='flex items-center gap-2 sm:gap-3 w-full'>
 								<div className='flex-1 bg-gray-900 rounded-xl border border-gray-700 px-3 sm:px-4 py-1.5 sm:py-2 focus-within:border-blue-500 transition-all flex items-center'>
-	<textarea
-		ref={textareaRef}
-		value={input}
-		onChange={(e) => setInput(e.target.value)}
-		onKeyDown={(e) => {
-			if (e.key === 'Enter' && !e.shiftKey) {
-				e.preventDefault()
-				sendMessage(input)
-			}
-		}}
-		placeholder='Введите сообщение ...'
-		rows={1}
-		maxLength={40}
-		className='py-1 sm:py-0.5 w-full border-none outline-none resize-none font-sans bg-transparent text-sm sm-text-base text-white placeholder:text-gray-500'
-	/>
-</div>
+									<textarea
+										ref={textareaRef}
+										value={input}
+										onChange={(e) => setInput(e.target.value)}
+										onKeyDown={(e) => {
+											if (e.key === 'Enter' && !e.shiftKey) {
+												e.preventDefault()
+												sendMessage(input)
+											}
+										}}
+										placeholder='Введите сообщение ...'
+										rows={1}
+										maxLength={40}
+										className='py-1 sm:py-0.5 w-full border-none outline-none resize-none font-sans bg-transparent text-sm sm-text-base text-white placeholder:text-gray-500'
+									/>
+								</div>
 
 								{isMobile ? (
 									input.trim() ? (
