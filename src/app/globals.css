@@ -1,46 +1,29 @@
-/* Убираем двойной скролл на мобильных устройствах */
-html {
-	overflow: hidden;
-	height: 100%;
-	position: fixed;
-	width: 100%;
+@import 'tailwindcss';
+
+:root {
+	--background: #ffffff;
+	--foreground: #171717;
+}
+
+@theme {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--background: #0a0a0a;
+		--foreground: #ededed;
+	}
 }
 
 body {
-	overflow: hidden;
-	height: 100%;
-	margin: 0;
-	padding: 0;
-	position: fixed;
-	width: 100%;
 	background: var(--background);
 	color: var(--foreground);
 	font-family: var(--font-geist-sans, system-ui, -apple-system, sans-serif);
 }
 
-/* Для мобильных устройств */
-@media (max-width: 768px) {
-	html,
-	body {
-		overflow: hidden;
-		position: fixed;
-		width: 100%;
-		height: 100%;
-		-webkit-overflow-scrolling: touch;
-	}
-
-	body {
-		overscroll-behavior: none;
-	}
-}
-
-/* Контейнер чата должен иметь свой скролл */
-.chat-container {
-	-webkit-overflow-scrolling: touch;
-	overscroll-behavior: contain;
-}
-
-/* Остальные стили скроллбара */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
 	width: 8px;
 	height: 8px;
@@ -78,4 +61,16 @@ body {
 
 .mic-listening {
 	animation: pulse-ring 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+/* Убираем двойной скролл на мобильных */
+.chat-container {
+	-webkit-overflow-scrolling: touch;
+	overscroll-behavior: contain;
+}
+
+@media (max-width: 768px) {
+	.chat-container {
+		overflow-y: auto !important;
+	}
 }
