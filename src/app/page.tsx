@@ -337,14 +337,15 @@ export default function Home() {
 			)
 			const data = await response.json()
 
-			// Всегда показываем specialResponse, если он есть
+			// Исправлено: показываем и текст, и файлы, если есть
 			if (data.specialResponse) {
 				setMessages((prev) => [
 					...prev,
 					{
 						role: 'assistant',
 						content: data.specialResponse,
-						files: data.results || undefined // Добавляем файлы, если есть
+						files:
+							data.results && data.results.length > 0 ? data.results : undefined
 					}
 				])
 			} else if (data.results && data.results.length > 0) {
