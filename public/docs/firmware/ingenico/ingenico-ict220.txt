@@ -46,15 +46,18 @@
 Шаг 19: Дождитесь загрузки UPOS
 
 --- КЛЮЧЕВЫЕ СЛОВА ---
+прошивка Ingenico
+прошивка Инженико
+прошить Ingenico
+прошить Инженико
+прошивке Ingenico
+прошивке Инженико
 прошивка Ingenico ICT220
-прошить Ingenico ICT220
-как прошить Ingenico ICT220
-прошивка ICT220
-прошить ICT220
-ingenico ict220 прошивка
-файл прошивки ingenico ict220
 прошивка Ingenico ICT250
-ingenico ict250 прошивка
+прошить Ingenico ICT220
+прошить Ingenico ICT250
+прошивке Ingenico ICT220
+прошивке Ingenico ICT250
 
 --- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---
 Папка с файлами: https://disk.yandex.ru/d/-L6rGWh_bGYcog

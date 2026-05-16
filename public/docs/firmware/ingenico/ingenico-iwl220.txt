@@ -40,15 +40,18 @@
 Шаг 16: После перезагрузки терминала дождитесь загрузки UPOS
 
 --- КЛЮЧЕВЫЕ СЛОВА ---
+прошивка Ingenico
+прошивка Инженико
+прошить Ingenico
+прошить Инженико
+прошивке Ingenico
+прошивке Инженико
 прошивка Ingenico IWL220
-прошить Ingenico IWL220
-как прошить Ingenico IWL220
-прошивка IWL220
-прошить IWL220
-ingenico iwl220 прошивка
-файл прошивки ingenico iwl220
 прошивка Ingenico IWL250
-ingenico iwl250 прошивка
+прошить Ingenico IWL220
+прошить Ingenico IWL250
+прошивке Ingenico IWL220
+прошивке Ingenico IWL250
 
 --- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---
 Папка с файлами: https://disk.yandex.ru/d/-L6rGWh_bGYcog

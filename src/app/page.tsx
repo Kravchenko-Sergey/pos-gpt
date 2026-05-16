@@ -25,32 +25,41 @@ type Message = {
 	}[]
 }
 
-// Функция для преобразования ссылок в кликабельные
+// Функция для преобразования ссылок в кликабельные (без лишних <br/>)
 function renderContentWithLinks(text: string) {
 	if (!text) return null
 
-	// Сначала заменяем переносы строк на <br/>
-	const withBreaks = text.replace(/\n/g, '<br/>')
+	// Разбиваем по строкам и обрабатываем каждую строку отдельно
+	const lines = text.split('\n')
 
-	// Потом обрабатываем ссылки
-	const urlRegex = /(https?:\/\/[^\s]+)/g
-	const parts = withBreaks.split(urlRegex)
+	return lines.map((line, lineIndex) => {
+		// Обрабатываем ссылки в строке
+		const urlRegex = /(https?:\/\/[^\s]+)/g
+		const parts = line.split(urlRegex)
 
-	return parts.map((part, index) => {
-		if (part?.match(urlRegex)) {
-			return (
-				<a
-					key={index}
-					href={part}
-					target='_blank'
-					rel='noopener noreferrer'
-					className='text-blue-400 underline cursor-pointer hover:text-blue-300 transition-colors'
-				>
-					{part}
-				</a>
-			)
-		}
-		return <span key={index} dangerouslySetInnerHTML={{ __html: part }} />
+		const lineContent = parts.map((part, partIndex) => {
+			if (part?.match(urlRegex)) {
+				return (
+					<a
+						key={partIndex}
+						href={part}
+						target='_blank'
+						rel='noopener noreferrer'
+						className='text-blue-400 underline cursor-pointer hover:text-blue-300 transition-colors break-all'
+					>
+						{part}
+					</a>
+				)
+			}
+			return <span key={partIndex}>{part}</span>
+		})
+
+		return (
+			<div key={lineIndex}>
+				{lineContent}
+				{lineIndex < lines.length - 1 && <br />}
+			</div>
+		)
 	})
 }
 
@@ -256,7 +265,7 @@ export default function Home() {
 		{
 			role: 'assistant',
 			content:
-				'Привет! Я ищу по ключевым фразам в документации. Спросите меня о прошивке, актуальных версиях, ошибках или попросите поделиться файлом'
+				'Привет! Я ищу информацию в документации по ключевым словам. Спроси меня о прошивках, актуальных версиях или ошибках. Также могу найти нужный файл'
 		}
 	])
 	const [input, setInput] = useState('')
@@ -267,10 +276,17 @@ export default function Home() {
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 	const [isMobile, setIsMobile] = useState(false)
 	const [showScrollButton, setShowScrollButton] = useState(false)
+	const [expandedFiles, setExpandedFiles] = useState<Record<string, boolean>>(
+		{}
+	)
 	const chatContainerRef = useRef<HTMLDivElement>(null)
 
 	const scrollToBottom = () => {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+	}
+
+	const toggleFile = (filename: string) => {
+		setExpandedFiles((prev) => ({ ...prev, [filename]: !prev[filename] }))
 	}
 
 	const handleScroll = () => {
@@ -391,6 +407,23 @@ export default function Home() {
 		}
 	}
 
+	function getDisplayTitle(file: {
+		filename: string
+		content: string
+	}): string {
+		const firstLine = file.content.split('\n')[0]?.trim() || ''
+		// Если первая строка похожа на заголовок (не слишком длинная и не ссылка)
+		if (
+			firstLine &&
+			firstLine.length > 0 &&
+			firstLine.length < 60 &&
+			!firstLine.startsWith('http')
+		) {
+			return firstLine.replace(/^#+\s*/, '')
+		}
+		return file.filename
+	}
+
 	return (
 		<>
 			<InstructionsModal
@@ -469,7 +502,7 @@ export default function Home() {
 								>
 									{message.content && (
 										<div
-											className={`px-3 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-sm sm:text-base leading-relaxed ${
+											className={`px-3 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-sm leading-relaxed ${
 												message.role === 'user'
 													? 'bg-blue-600 text-white rounded-br-sm'
 													: 'bg-gray-800 text-gray-100 rounded-bl-sm border border-gray-700'
@@ -481,41 +514,70 @@ export default function Home() {
 
 									{message.files && message.files.length > 0 && (
 										<div className='mt-2 sm:mt-3 space-y-2 sm:space-y-3'>
-											{message.files.map((file, fileIdx) => (
-												<div
-													key={fileIdx}
-													className='bg-gray-800 rounded-lg sm:rounded-xl overflow-hidden border border-gray-700 hover:border-gray-600 transition-all'
-												>
-													{file.content && (
-														<div className='p-3 sm:p-4 bg-gray-900/30'>
-															<div className='text-sm sm:text-base leading-relaxed whitespace-pre-wrap text-gray-300'>
-																{renderContentWithLinks(file.content)}
-															</div>
-														</div>
-													)}
+											{message.files.map((file, fileIdx) => {
+												const isExpanded =
+													expandedFiles[`${idx}-${fileIdx}`] || false
+												const previewLines = file.content
+													.split('\n')
+													.slice(0, 3)
+													.join('\n')
+												const hasMore = file.content.split('\n').length > 3
 
-													{file.attachments && file.attachments.length > 0 && (
-														<div className='px-3 sm:px-4 py-2 sm:py-3 bg-gray-800/50 border-t border-gray-700'>
-															<div className='flex flex-wrap gap-1.5 sm:gap-2'>
-																{file.attachments.map((attachment, linkIdx) => (
-																	<a
-																		key={linkIdx}
-																		href={attachment.url}
-																		target='_blank'
-																		rel='noopener noreferrer'
-																		className='inline-flex items-start gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-700 text-green-400 rounded-lg text-sm sm:text-base hover:bg-gray-600 hover:text-green-300 transition-all break-all whitespace-normal max-w-full'
-																	>
-																		<Paperclip className='w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 mt-0.5 text-gray-400' />
-																		<span className='break-all'>
-																			{attachment.name}
-																		</span>
-																	</a>
-																))}
+												return (
+													<div
+														key={fileIdx}
+														className='bg-gray-800 rounded-lg overflow-hidden border border-gray-700'
+													>
+														<button
+															onClick={() => toggleFile(`${idx}-${fileIdx}`)}
+															className='w-full px-4 py-3 flex items-center justify-between bg-gray-800 hover:bg-gray-700 transition-colors text-left'
+														>
+															<div className='flex items-center gap-2'>
+																<FileText className='w-4 h-4 text-blue-400' />
+																<span className='font-medium text-white'>
+																	{getDisplayTitle(file)}
+																</span>
 															</div>
-														</div>
-													)}
-												</div>
-											))}
+															<ChevronDown
+																className={`w-4 h-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+															/>
+														</button>
+
+														{isExpanded && (
+															<>
+																<div className='p-4 bg-gray-900/30'>
+																	<div className='text-sm leading-relaxed whitespace-pre-wrap text-gray-300'>
+																		{renderContentWithLinks(file.content)}
+																	</div>
+																</div>
+																{file.attachments &&
+																	file.attachments.length > 0 && (
+																		<div className='px-3 sm:px-4 py-2 sm:py-3 bg-gray-800/50 border-t border-gray-700'>
+																			<div className='flex flex-wrap gap-1.5 sm:gap-2'>
+																				{file.attachments.map(
+																					(attachment, linkIdx) => (
+																						<a
+																							key={linkIdx}
+																							href={attachment.url}
+																							target='_blank'
+																							rel='noopener noreferrer'
+																							className='inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-700 text-green-400 rounded-lg text-xs sm:text-sm hover:bg-gray-600 hover:text-green-300 transition-all break-all whitespace-normal max-w-full'
+																						>
+																							<Paperclip className='w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-gray-400' />
+																							<span className='break-all'>
+																								{attachment.name}
+																							</span>
+																						</a>
+																					)
+																				)}
+																			</div>
+																		</div>
+																	)}
+															</>
+														)}
+													</div>
+												)
+											})}
 										</div>
 									)}
 								</div>
@@ -569,7 +631,7 @@ export default function Home() {
 										placeholder='Введите сообщение ...'
 										rows={1}
 										maxLength={40}
-										className='py-1 sm:py-0.5 w-full border-none outline-none resize-none font-sans bg-transparent text-sm sm:text-lg text-white placeholder:text-gray-500'
+										className='py-0.5 w-full border-none outline-none resize-none font-sans bg-transparent text-sm sm:text-base text-white placeholder:text-gray-500'
 									/>
 								</div>
 

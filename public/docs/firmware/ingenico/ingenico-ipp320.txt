@@ -58,15 +58,18 @@
 Шаг 25: Дождитесь загрузки UPOS
 
 --- КЛЮЧЕВЫЕ СЛОВА ---
+прошивка Ingenico
+прошивка Инженико
+прошить Ingenico
+прошить Инженико
+прошивке Ingenico
+прошивке Инженико
 прошивка Ingenico IPP320
-прошить Ingenico IPP320
-как прошить Ingenico IPP320
-прошивка IPP320
-прошить IPP320
-ingenico ipp320 прошивка
-файл прошивки ingenico ipp320
 прошивка Ingenico IPP350
-ingenico ipp350 прошивка
+прошить Ingenico IPP320
+прошить Ingenico IPP350
+прошивке Ingenico IPP320
+прошивке Ingenico IPP350
 
 --- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---
 Программа LLT: https://disk.yandex.ru/d/BbiiXdxjEfw_PA
