@@ -74,3 +74,35 @@ body {
 		overflow-y: auto !important;
 	}
 }
+
+/* По умолчанию (мобильные) — скрыт */
+.overflow-y-auto {
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+	display: none;
+}
+
+/* На десктопе (шире 768px) — показываем тонкий */
+@media (min-width: 768px) {
+	.overflow-y-auto {
+		scrollbar-width: thin;
+		scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+	}
+
+	.overflow-y-auto::-webkit-scrollbar {
+		display: block;
+		width: 4px;
+	}
+
+	.overflow-y-auto::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	.overflow-y-auto::-webkit-scrollbar-thumb {
+		background: rgba(156, 163, 175, 0.5);
+		border-radius: 10px;
+	}
+}
