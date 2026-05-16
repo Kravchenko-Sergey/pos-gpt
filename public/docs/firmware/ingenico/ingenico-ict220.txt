@@ -58,6 +58,13 @@
 прошить Ingenico ICT250
 прошивке Ingenico ICT220
 прошивке Ingenico ICT250
+прошивка ICT220
+прошивка ICT250
+прошить ICT220
+прошить ICT250
+прошивке ICT220
+прошивке ICT250
+
 
 --- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---
 Папка с файлами: https://disk.yandex.ru/d/-L6rGWh_bGYcog

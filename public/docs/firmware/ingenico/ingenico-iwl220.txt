@@ -52,6 +52,12 @@
 прошить Ingenico IWL250
 прошивке Ingenico IWL220
 прошивке Ingenico IWL250
+прошивка IWL220
+прошивка IWL250
+прошить IWL220
+прошить IWL250
+прошивке IWL220
+прошивке IWL250
 
 --- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---
 Папка с файлами: https://disk.yandex.ru/d/-L6rGWh_bGYcog

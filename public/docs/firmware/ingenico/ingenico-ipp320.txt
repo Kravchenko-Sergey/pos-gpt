@@ -70,6 +70,12 @@
 прошить Ingenico IPP350
 прошивке Ingenico IPP320
 прошивке Ingenico IPP350
+прошивка IPP320
+прошивка IPP350
+прошить IPP320
+прошить IPP350
+прошивке IPP320
+прошивке IPP350
 
 --- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---
 Программа LLT: https://disk.yandex.ru/d/BbiiXdxjEfw_PA
