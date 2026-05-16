@@ -561,13 +561,6 @@ export default function Home() {
 
 									{message.files && message.files.length > 0 && (
 										<div className='mt-2 sm:mt-3 space-y-2 sm:space-y-3'>
-											{/* Счетчик файлов */}
-											{message.files.length > 1 && (
-												<div className='text-xs text-gray-400 px-1 mb-2'>
-													Найдено {message.files.length} документа
-												</div>
-											)}
-
 											{message.files.map((file, fileIdx) => {
 												const fileKey = `${idx}-${fileIdx}`
 												const isExpanded = expandedFiles[fileKey] || false
@@ -596,11 +589,6 @@ export default function Home() {
 																	<span className='font-medium text-white text-sm truncate'>
 																		{getDisplayTitle(file)}
 																	</span>
-																	{!isExpanded && hasContent && (
-																		<span className='text-[10px] px-1.5 py-0.5 bg-gray-700 rounded-full text-gray-400'>
-																			{file.content.split('\n').length} строк
-																		</span>
-																	)}
 																</div>
 															</div>
 															<ChevronDown
