@@ -398,7 +398,7 @@ export default function Home() {
 				onClose={() => setIsInstructionsOpen(false)}
 			/>
 
-			<div className='flex flex-col h-dvh bg-gray-900'>
+			<div className='flex flex-col h-screen bg-gray-900 overflow-hidden'>
 				{/* Header */}
 				<div className='shrink-0 sticky top-0 bg-gray-800/90 backdrop-blur-md border-b border-gray-700/50 px-4 sm:px-6 py-3 z-10'>
 					<div className='max-w-3xl mx-auto flex items-center justify-between gap-2'>
