@@ -571,8 +571,8 @@ export default function Home() {
 											className='w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blue-600 text-white disabled:bg-gray-700 hover:bg-blue-500 transition-all flex items-center justify-center shrink-0 cursor-pointer'
 										>
 											<svg
-												width='14'
-												height='14'
+												width='16'
+												height='16'
 												viewBox='0 0 24 24'
 												fill='none'
 												stroke='currentColor'

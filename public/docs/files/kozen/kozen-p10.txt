@@ -52,8 +52,7 @@ firmware Kozen P10
 обновление ПО Kozen P10
 файл обновления P10
 файл обновления Kozen P10
-1.6.11
-1 6 11
+1611
 
 --- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---
 Программа Flash Tool: https://disk.yandex.ru/d/rd08ougjIKg4Lg

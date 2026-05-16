@@ -27,6 +27,17 @@ function hasLetters(word: string): boolean {
 	return /[а-яa-z]/i.test(word)
 }
 
+// Нормализует число: удаляет всё, кроме цифр (точки, пробелы, дефисы, слеши и т.д.)
+function normalizeNumberString(str: string): string {
+	return str.replace(/\D/g, '')
+}
+
+// Проверяет, является ли запрос числовым (с учётом пробелов и точек)
+function isNumericQueryWithSeparators(query: string): boolean {
+	const withoutSeparators = query.replace(/[\s\.\-_\/]+/g, '')
+	return /^\d+$/.test(withoutSeparators) && withoutSeparators.length > 0
+}
+
 let cachedFiles: { path: string; content: string }[] | null = null
 
 export async function GET(request: NextRequest) {
@@ -96,6 +107,9 @@ export async function GET(request: NextRequest) {
 
 		const results: any[] = []
 
+		// Определяем, является ли запрос числовым (с учётом разделителей)
+		const isNumericQuery = isNumericQueryWithSeparators(query)
+
 		for (const { path: filePath, content: fullContent } of cachedFiles) {
 			const relativePath = path.relative(docsDir, filePath)
 			const displayName = relativePath.replace(/\.txt$/, '')
@@ -104,7 +118,7 @@ export async function GET(request: NextRequest) {
 			if (keywordSectionIndex === -1) continue
 
 			// Берём весь текст ДО секции ключевых слов
-			let contentWithoutKeywords = fullContent
+			const contentWithoutKeywords = fullContent
 				.substring(0, keywordSectionIndex)
 				.trim()
 
@@ -127,9 +141,6 @@ export async function GET(request: NextRequest) {
 						}
 					}
 				}
-
-				// НЕ добавляем приложенные файлы в content - они будут только в attachments
-				// Этот блок полностью удалён
 			}
 
 			// Извлекаем ключевые слова
@@ -149,7 +160,6 @@ export async function GET(request: NextRequest) {
 
 			// Проверяем соответствие запроса
 			let isMatch = false
-			const isNumericQuery = /^\d+$/.test(query)
 
 			for (const keyword of keywords) {
 				// Определяем тип ключевой фразы: есть буквы → текстовая, только цифры → числовая
@@ -159,14 +169,22 @@ export async function GET(request: NextRequest) {
 					keywordNumbers && keywordNumbers[0] === keyword && !keywordHasLetters
 
 				if (isNumericQuery) {
-					// ЧИСЛОВОЙ ЗАПРОС (например, "5")
-					// Ищем только числовые ключевые фразы (только цифры, без букв)
-					if (onlyNumber && keyword === query) {
+					// ЧИСЛОВОЙ ЗАПРОС (например, "4.9.12" или "4 9 12" или "4-9-12")
+					// Нормализуем оба значения: удаляем всё, кроме цифр
+					const normalizedKeywordDigits = normalizeNumberString(keyword)
+					const normalizedQueryDigits = normalizeNumberString(query)
+
+					// Ищем только числовые ключевые фразы
+					if (
+						onlyNumber &&
+						normalizedKeywordDigits === normalizedQueryDigits &&
+						normalizedKeywordDigits.length > 0
+					) {
 						isMatch = true
 						break
 					}
 				} else {
-					// ТЕКСТОВЫЙ ЗАПРОС (например, "прошивка 5 ай")
+					// ТЕКСТОВЫЙ ЗАПРОС (например, "прошивка 5i")
 					// Ищем только текстовые ключевые фразы (с буквами)
 					if (keywordHasLetters && query.includes(keyword)) {
 						isMatch = true
