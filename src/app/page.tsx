@@ -280,13 +280,39 @@ export default function Home() {
 		{}
 	)
 	const chatContainerRef = useRef<HTMLDivElement>(null)
+	const fileRefs = useRef<Map<string, HTMLDivElement>>(new Map())
 
 	const scrollToBottom = () => {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
 	}
 
-	const toggleFile = (filename: string) => {
-		setExpandedFiles((prev) => ({ ...prev, [filename]: !prev[filename] }))
+	const scrollToFile = (key: string) => {
+		const fileElement = fileRefs.current.get(key)
+		if (fileElement) {
+			// Немного отступаем сверху, чтобы не прилипало к краю
+			const offset = 80
+			const elementPosition = fileElement.getBoundingClientRect().top
+			const containerPosition =
+				chatContainerRef.current?.getBoundingClientRect().top || 0
+			const scrollTop = chatContainerRef.current?.scrollTop || 0
+			const targetPosition =
+				elementPosition - containerPosition + scrollTop - offset
+
+			chatContainerRef.current?.scrollTo({
+				top: targetPosition,
+				behavior: 'smooth'
+			})
+		}
+	}
+
+	const toggleFile = (key: string) => {
+		const isCurrentlyExpanded = expandedFiles[key]
+		setExpandedFiles((prev) => ({ ...prev, [key]: !prev[key] }))
+
+		// Если открываем файл (не закрываем), скроллим к нему
+		if (!isCurrentlyExpanded) {
+			setTimeout(() => scrollToFile(key), 100)
+		}
 	}
 
 	const handleScroll = () => {
@@ -338,6 +364,27 @@ export default function Home() {
 		}
 		checkDevice()
 	}, [])
+
+	// Автоматическое разворачивание, если результат один
+	useEffect(() => {
+		const lastMessage = messages[messages.length - 1]
+		if (lastMessage?.role === 'assistant' && lastMessage.files) {
+			const filesCount = lastMessage.files.length
+			const messageIndex = messages.length - 1
+			const newExpandedState: Record<string, boolean> = {}
+
+			// Если файл один — открываем его
+			if (filesCount === 1) {
+				const fileKey = `${messageIndex}-0`
+				newExpandedState[fileKey] = true
+
+				// Скроллим к файлу после его открытия
+				setTimeout(() => scrollToFile(fileKey), 200)
+			}
+
+			setExpandedFiles((prev) => ({ ...prev, ...newExpandedState }))
+		}
+	}, [messages])
 
 	// Функция отправки сообщения
 	const sendMessage = async (messageText: string) => {
@@ -514,46 +561,64 @@ export default function Home() {
 
 									{message.files && message.files.length > 0 && (
 										<div className='mt-2 sm:mt-3 space-y-2 sm:space-y-3'>
+											{/* Счетчик файлов */}
+											{message.files.length > 1 && (
+												<div className='text-xs text-gray-400 px-1 mb-2'>
+													Найдено {message.files.length} документа
+												</div>
+											)}
+
 											{message.files.map((file, fileIdx) => {
-												const isExpanded =
-													expandedFiles[`${idx}-${fileIdx}`] || false
-												const previewLines = file.content
-													.split('\n')
-													.slice(0, 3)
-													.join('\n')
-												const hasMore = file.content.split('\n').length > 3
+												const fileKey = `${idx}-${fileIdx}`
+												const isExpanded = expandedFiles[fileKey] || false
+												const hasContent =
+													file.content && file.content.length > 0
 
 												return (
 													<div
 														key={fileIdx}
-														className='bg-gray-800 rounded-lg overflow-hidden border border-gray-700'
+														ref={(el) => {
+															if (el) {
+																fileRefs.current.set(fileKey, el)
+															} else {
+																fileRefs.current.delete(fileKey)
+															}
+														}}
+														className='bg-gray-800 rounded-xl overflow-hidden border border-gray-700 hover:border-gray-600 transition-all'
 													>
 														<button
-															onClick={() => toggleFile(`${idx}-${fileIdx}`)}
-															className='w-full px-4 py-3 flex items-center justify-between bg-gray-800 hover:bg-gray-700 transition-colors text-left'
+															onClick={() => toggleFile(fileKey)}
+															className='w-full px-4 py-3 flex items-start justify-between gap-3 bg-gray-800 hover:bg-gray-700/50 transition-colors text-left'
 														>
-															<div className='flex items-center gap-2'>
-																<FileText className='w-4 h-4 text-blue-400' />
-																<span className='font-medium text-white'>
-																	{getDisplayTitle(file)}
-																</span>
+															<div className='flex-1 min-w-0'>
+																<div className='flex items-center gap-2'>
+																	<FileText className='w-4 h-4 text-blue-400 shrink-0 mt-0.5' />
+																	<span className='font-medium text-white text-sm truncate'>
+																		{getDisplayTitle(file)}
+																	</span>
+																	{!isExpanded && hasContent && (
+																		<span className='text-[10px] px-1.5 py-0.5 bg-gray-700 rounded-full text-gray-400'>
+																			{file.content.split('\n').length} строк
+																		</span>
+																	)}
+																</div>
 															</div>
 															<ChevronDown
-																className={`w-4 h-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+																className={`w-4 h-4 text-gray-400 transition-transform shrink-0 mt-1 ${isExpanded ? 'rotate-180' : ''}`}
 															/>
 														</button>
 
-														{isExpanded && (
+														{isExpanded && hasContent && (
 															<>
-																<div className='p-4 bg-gray-900/30'>
+																<div className='px-4 py-3 bg-gray-900/30 border-t border-gray-700'>
 																	<div className='text-sm leading-relaxed whitespace-pre-wrap text-gray-300'>
 																		{renderContentWithLinks(file.content)}
 																	</div>
 																</div>
 																{file.attachments &&
 																	file.attachments.length > 0 && (
-																		<div className='px-3 sm:px-4 py-2 sm:py-3 bg-gray-800/50 border-t border-gray-700'>
-																			<div className='flex flex-wrap gap-1.5 sm:gap-2'>
+																		<div className='px-4 py-2 bg-gray-800/50 border-t border-gray-700'>
+																			<div className='flex flex-wrap gap-2'>
 																				{file.attachments.map(
 																					(attachment, linkIdx) => (
 																						<a
@@ -561,12 +626,10 @@ export default function Home() {
 																							href={attachment.url}
 																							target='_blank'
 																							rel='noopener noreferrer'
-																							className='inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-700 text-green-400 rounded-lg text-xs sm:text-sm hover:bg-gray-600 hover:text-green-300 transition-all break-all whitespace-normal max-w-full'
+																							className='inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-700 text-green-400 rounded-lg text-sm hover:bg-gray-600 hover:text-green-300 transition-all'
 																						>
-																							<Paperclip className='w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-gray-400' />
-																							<span className='break-all'>
-																								{attachment.name}
-																							</span>
+																							<Paperclip className='w-3.5 h-3.5' />
+																							<span>{attachment.name}</span>
 																						</a>
 																					)
 																				)}
