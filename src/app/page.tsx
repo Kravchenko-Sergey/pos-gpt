@@ -569,7 +569,7 @@ export default function Home() {
 										placeholder='Введите сообщение ...'
 										rows={1}
 										maxLength={40}
-										className='py-1 sm:py-0.5 w-full border-none outline-none resize-none font-sans bg-transparent text-sm sm-text-base text-white placeholder:text-gray-500'
+										className='py-1 sm:py-0.5 w-full border-none outline-none resize-none font-sans bg-transparent text-sm sm:text-lg text-white placeholder:text-gray-500'
 									/>
 								</div>
 
