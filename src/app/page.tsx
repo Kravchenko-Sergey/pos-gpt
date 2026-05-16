@@ -398,9 +398,9 @@ export default function Home() {
 				onClose={() => setIsInstructionsOpen(false)}
 			/>
 
-			<div className='flex flex-col h-screen bg-gray-900 overflow-hidden'>
+			<div className='fixed inset-0 bg-gray-900 flex flex-col'>
 				{/* Header */}
-				<div className='shrink-0 sticky top-0 bg-gray-800/90 backdrop-blur-md border-b border-gray-700/50 px-4 sm:px-6 py-3 z-10'>
+				<div className='shrink-0 bg-gray-800/90 backdrop-blur-md border-b border-gray-700/50 px-4 sm:px-6 py-3 z-10'>
 					<div className='max-w-3xl mx-auto flex items-center justify-between gap-2'>
 						<div className='flex items-center gap-2 shrink-0'>
 							<Bot className='w-5 h-5 sm:w-6 sm:h-6 text-blue-400' />
@@ -449,6 +449,10 @@ export default function Home() {
 					ref={chatContainerRef}
 					onScroll={handleScroll}
 					className='flex-1 overflow-y-auto px-2 sm:px-6 py-4 sm:py-8'
+					style={{
+						WebkitOverflowScrolling: 'touch',
+						overscrollBehavior: 'contain'
+					}}
 				>
 					<div className='max-w-3xl mx-auto space-y-3 sm:space-y-4'>
 						{messages.map((message, idx) => (

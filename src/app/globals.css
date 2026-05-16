@@ -5,6 +5,30 @@
 	--foreground: #171717;
 }
 
+/* Убираем все скроллы на корневых элементах */
+html,
+body {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	position: fixed;
+}
+
+/* Только контейнер сообщений может скроллиться */
+.overflow-y-auto {
+	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
+}
+
+/* Убираем дефолтные отступы */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
 @theme {
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
