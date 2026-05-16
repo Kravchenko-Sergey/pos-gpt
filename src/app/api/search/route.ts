@@ -51,8 +51,15 @@ export async function GET(request: NextRequest) {
 	const q = query.replace(/[!?.,;:]$/, '')
 	if (['привет', 'здравствуй', 'hi', 'hello', 'ку', 'дарова'].includes(q)) {
 		return NextResponse.json({
-			specialResponse:
-				'Привет! Я ищу по ключевым фразам в документации. Спрашивай, не стесняйся!',
+			specialResponse: `🤖 <strong>POS-GPT — поиск по документации</strong><br/><br/>
+📁 <strong>Что ищу:</strong><br/>
+Прошивки, инструкции, регформы, техпаспорта, коды ошибок<br/><br/>
+📝 <strong>Как писать:</strong><br/>
+"прошивка 7.3" | "ошибка 4119" | "установка P10" | "регформа ИКР"<br/><br/>
+📱 <strong>Доступные модели:</strong><br/>
+Эвотор (5i/6/7.2/7.3/10), Kozen (P10/P12), Pax, Tactilion, Verifone, Ingenico, Castles<br/><br/>
+💬 <strong>Пример:</strong> "горячая замена Эвотор" или "4.9.12"<br/><br/>
+Спрашивай — помогу найти!`,
 			results: []
 		})
 	}
@@ -73,8 +80,20 @@ export async function GET(request: NextRequest) {
 		].includes(q)
 	) {
 		return NextResponse.json({
-			specialResponse:
-				'Я POS-GPT — бот для поиска по документации. Помогаю находить инструкции, коды ошибок, файлы прошивок и много чего ещё. Просто напиши, что нужно: "прошивка 5i", "ошибка 3924", "техпаспорт X5"',
+			specialResponse: `🤖 **POS-GPT — поиск по документации**
+
+📁 **Что ищу:**
+Прошивки, инструкции, регформы, техпаспорта, коды ошибок
+
+📝 **Как писать:**
+"прошивка 7.3" | "ошибка 4119" | "установка P10" | "регформа ИКР"
+
+📱 **Доступные модели:**
+Эвотор (5i/6/7.2/7.3/10), Kozen (P10/P12), Pax, Tactilion, Verifone, Ingenico, Castles
+
+💬 **Пример:** "горячая замена Эвотор" или "4.9.12"
+
+Спрашивай — помогу найти!`,
 			results: []
 		})
 	}
@@ -206,9 +225,55 @@ export async function GET(request: NextRequest) {
 			(r, i, self) => i === self.findIndex((t) => t.filename === r.filename)
 		)
 
-		return NextResponse.json({ results: uniqueResults })
+		// ДОБАВЛЕНО: человеческий ответ, если ничего не найдено
+		if (uniqueResults.length === 0) {
+			let friendlyResponse = ''
+
+			if (query.includes('прошивка') || query.includes('firmware')) {
+				friendlyResponse =
+					'Ищу прошивку... Не нашёл точного совпадения. Попробуй написать модель точнее, например "прошивка 7.3" или "прошивка 5i"'
+			} else if (
+				query.includes('ошибка') ||
+				query.includes('error') ||
+				/^\d+$/.test(query.replace(/\s/g, ''))
+			) {
+				friendlyResponse =
+					'Проверяю коды ошибок... Не нашёл такой код. Уточни, пожалуйста, или напиши "ошибка 3924" для примера'
+			} else if (query.includes('инструкция') || query.includes('как')) {
+				friendlyResponse =
+					'Ищу инструкцию... Не нашёл. Попробуй переформулировать запрос или спроси "помощь"'
+			} else {
+				friendlyResponse =
+					'Ничего не нашёл по твоему запросу. Попробуй спросить по-другому или напиши "помощь" — я расскажу, что умею'
+			}
+
+			return NextResponse.json({
+				specialResponse: friendlyResponse,
+				results: []
+			})
+		}
+
+		// ДОБАВЛЕНО: человеческий ответ, если что-то найдено
+		const resultCount = uniqueResults.length
+		let foundResponse = `Нашёл ${resultCount} ${resultCount === 1 ? 'документ' : resultCount < 5 ? 'документа' : 'документов'}. `
+
+		if (resultCount === 1) {
+			foundResponse += `Вот что есть по теме "${rawQuery}":`
+		} else {
+			foundResponse += `Вот результаты поиска по "${rawQuery}":`
+		}
+
+		return NextResponse.json({
+			specialResponse: foundResponse,
+			results: uniqueResults
+		})
 	} catch (error: any) {
 		console.error('Ошибка:', error)
-		return NextResponse.json({ results: [], error: error.message })
+		return NextResponse.json({
+			specialResponse:
+				'Что-то пошло не так. Попробуй ещё раз или напиши "помощь"',
+			results: [],
+			error: error.message
+		})
 	}
 }

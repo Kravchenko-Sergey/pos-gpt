@@ -29,8 +29,12 @@ type Message = {
 function renderContentWithLinks(text: string) {
 	if (!text) return null
 
+	// Сначала заменяем переносы строк на <br/>
+	const withBreaks = text.replace(/\n/g, '<br/>')
+
+	// Потом обрабатываем ссылки
 	const urlRegex = /(https?:\/\/[^\s]+)/g
-	const parts = text.split(urlRegex)
+	const parts = withBreaks.split(urlRegex)
 
 	return parts.map((part, index) => {
 		if (part?.match(urlRegex)) {
@@ -46,7 +50,7 @@ function renderContentWithLinks(text: string) {
 				</a>
 			)
 		}
-		return part
+		return <span key={index} dangerouslySetInnerHTML={{ __html: part }} />
 	})
 }
 
@@ -333,12 +337,14 @@ export default function Home() {
 			)
 			const data = await response.json()
 
+			// Всегда показываем specialResponse, если он есть
 			if (data.specialResponse) {
 				setMessages((prev) => [
 					...prev,
 					{
 						role: 'assistant',
-						content: data.specialResponse
+						content: data.specialResponse,
+						files: data.results || undefined // Добавляем файлы, если есть
 					}
 				])
 			} else if (data.results && data.results.length > 0) {
