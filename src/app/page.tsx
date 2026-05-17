@@ -86,6 +86,8 @@ export default function Home() {
 	const chatContainerRef = useRef<HTMLDivElement>(null)
 	const fileRefs = useRef<Map<string, HTMLDivElement>>(new Map())
 
+	const isLight = theme === 'light'
+
 	// Проверка мобильного устройства
 	useEffect(() => {
 		const checkDevice = () => {
@@ -403,54 +405,38 @@ export default function Home() {
 
 					{/* Нижняя часть с переключателем темы */}
 					<div
-						className={`border-t p-4 ${
-							theme === 'light' ? 'border-gray-200' : 'border-gray-800'
-						}`}
+						className={`border-t p-4 ${isLight ? 'border-gray-200' : 'border-gray-800'}`}
 					>
 						<div className='flex items-center justify-between'>
 							<div className='flex items-center gap-2'>
-								{theme === 'dark' ? (
-									<Moon
-										className={`w-4 h-4 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}
+								{isLight ? (
+									<Sun
+										className={`w-4 h-4 ${isLight ? 'text-gray-600' : 'text-gray-400'}`}
 									/>
 								) : (
-									<Sun
-										className={`w-4 h-4 ${theme === 'light' ? 'text-gray-600' : 'text-gray-400'}`}
+									<Moon
+										className={`w-4 h-4 ${isLight ? 'text-gray-600' : 'text-gray-400'}`}
 									/>
 								)}
 								<span
-									className={`text-sm ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}
+									className={`text-sm ${isLight ? 'text-gray-700' : 'text-gray-300'}`}
 								>
 									Тема
 								</span>
 							</div>
 							<button
-								onClick={() =>
-									handleThemeChange(theme === 'dark' ? 'light' : 'dark')
-								}
+								onClick={() => handleThemeChange(isLight ? 'dark' : 'light')}
 								className='relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500'
 								style={{
-									backgroundColor: theme === 'dark' ? '#3b82f6' : '#d1d5db'
+									backgroundColor: isLight ? '#d1d5db' : '#3b82f6'
 								}}
 							>
 								<span
 									className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-										theme === 'dark' ? 'translate-x-6' : 'translate-x-1'
+										isLight ? 'translate-x-1' : 'translate-x-6'
 									}`}
 								/>
 							</button>
-						</div>
-
-						<div
-							className={`mt-4 pt-4 border-t ${
-								theme === 'light' ? 'border-gray-200' : 'border-gray-800'
-							}`}
-						>
-							<p
-								className={`text-xs text-center ${theme === 'light' ? 'text-gray-400' : 'text-gray-500'}`}
-							>
-								POS GPT v1.0.0
-							</p>
 						</div>
 					</div>
 				</div>
