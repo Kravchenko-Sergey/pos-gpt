@@ -460,7 +460,7 @@ export default function Home() {
 				<div
 					ref={chatContainerRef}
 					onScroll={handleScroll}
-					className='flex-1 overflow-y-auto px-2 sm:px-6 py-14'
+					className='flex-1 overflow-y-auto px-2 sm:px-6 py-10 sm:py-12'
 					style={{
 						WebkitOverflowScrolling: 'touch',
 						overscrollBehavior: 'contain'
