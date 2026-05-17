@@ -180,7 +180,7 @@ export function Sidebar({
 					{/* Версия приложения */}
 					<div className='mt-4 pt-4 border-t border-gray-200 dark:border-gray-800'>
 						<p className='text-xs text-center text-gray-400 dark:text-gray-500'>
-							POS GPT v1.0.5
+							POS GPT v1.0.0
 						</p>
 					</div>
 				</div>

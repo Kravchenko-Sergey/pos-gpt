@@ -15,6 +15,7 @@ import {
 	Moon
 } from 'lucide-react'
 import VoiceInput from '@/components/voice-input'
+import packageJson from '../../package.json'
 
 type Message = {
 	role: 'user' | 'assistant'
@@ -76,17 +77,38 @@ export default function Home() {
 	const [theme, setTheme] = useState<'light' | 'dark'>('dark')
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 	const [isMobile, setIsMobile] = useState(false)
-
-	const messagesEndRef = useRef<HTMLDivElement>(null)
-	const textareaRef = useRef<HTMLTextAreaElement>(null)
+	const [activeMessageIndex, setActiveMessageIndex] = useState(-1)
+	const [isNavHovered, setIsNavHovered] = useState(false)
 	const [showScrollButton, setShowScrollButton] = useState(false)
 	const [expandedFiles, setExpandedFiles] = useState<Record<string, boolean>>(
 		{}
 	)
+
+	const messagesEndRef = useRef<HTMLDivElement>(null)
+	const textareaRef = useRef<HTMLTextAreaElement>(null)
 	const chatContainerRef = useRef<HTMLDivElement>(null)
 	const fileRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+	const messageRefs = useRef<Map<number, HTMLDivElement>>(new Map())
+	const botMessageRefs = useRef<Map<number, HTMLDivElement>>(new Map())
+	const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+	const userMessageRefs = useRef<Map<number, HTMLDivElement>>(new Map())
+	const lastActiveIndexRef = useRef<number>(-1)
 
 	const isLight = theme === 'light'
+
+	const handleMouseEnter = () => {
+		if (hideTimeoutRef.current) {
+			clearTimeout(hideTimeoutRef.current)
+			hideTimeoutRef.current = null
+		}
+		setIsNavHovered(true)
+	}
+
+	const handleMouseLeave = () => {
+		hideTimeoutRef.current = setTimeout(() => {
+			setIsNavHovered(false)
+		}, 300)
+	}
 
 	// Проверка мобильного устройства
 	useEffect(() => {
@@ -137,6 +159,95 @@ export default function Home() {
 		}
 	}
 
+	const scrollToMessage = (index: number) => {
+		const messageElement = userMessageRefs.current.get(index)
+		if (messageElement && chatContainerRef.current) {
+			const container = chatContainerRef.current
+			// Уменьшаем offset для маленьких экранов
+			const offset = window.innerWidth < 640 ? 60 : 100
+
+			// Сразу устанавливаем активный индекс
+			setActiveMessageIndex(index)
+			lastActiveIndexRef.current = index
+
+			// Получаем позицию элемента
+			const elementRect = messageElement.getBoundingClientRect()
+			const containerRect = container.getBoundingClientRect()
+
+			// Вычисляем целевую позицию
+			let targetScroll =
+				container.scrollTop + (elementRect.top - containerRect.top) - offset
+
+			// Ограничиваем скролл в допустимых пределах
+			targetScroll = Math.max(
+				0,
+				Math.min(targetScroll, container.scrollHeight - container.clientHeight)
+			)
+
+			// Плавный скролл с анимацией
+			container.scrollTo({
+				top: targetScroll,
+				behavior: 'smooth'
+			})
+
+			// Корректировка после скролла для точного позиционирования
+			const checkAndAdjust = () => {
+				// Проверяем, не изменился ли индекс (если пользователь скроллит сам)
+				if (activeMessageIndex !== index) return
+
+				const newRect = messageElement.getBoundingClientRect()
+				const newContainerRect = container.getBoundingClientRect()
+
+				const currentTopOffset = newRect.top - newContainerRect.top
+				const tolerance = 20 // Увеличил допуск для стабильности
+
+				// Если элемент не на нужной позиции - корректируем
+				if (Math.abs(currentTopOffset - offset) > tolerance) {
+					const adjustment = container.scrollTop + (currentTopOffset - offset)
+					const adjustedScroll = Math.max(
+						0,
+						Math.min(
+							adjustment,
+							container.scrollHeight - container.clientHeight
+						)
+					)
+
+					container.scrollTo({
+						top: adjustedScroll,
+						behavior: 'smooth'
+					})
+				}
+
+				// Убеждаемся, что активный индекс не сбросился
+				setTimeout(() => {
+					if (activeMessageIndex === index) {
+						// Перепроверяем, все еще ли этот элемент активен
+						const finalRect = messageElement.getBoundingClientRect()
+						const finalContainerRect = container.getBoundingClientRect()
+						const finalOffset = finalRect.top - finalContainerRect.top
+
+						// Если элемент далеко от целевой позиции - возможно, пользователь скроллит
+						if (Math.abs(finalOffset - offset) < 100) {
+							setActiveMessageIndex(index)
+							lastActiveIndexRef.current = index
+						}
+					}
+				}, 300)
+			}
+
+			// Запускаем проверку с задержкой
+			setTimeout(checkAndAdjust, 200)
+			setTimeout(checkAndAdjust, 400)
+		}
+	}
+
+	// Вспомогательная функция для проверки, находимся ли мы внизу
+	const isAtBottom = () => {
+		if (!chatContainerRef.current) return false
+		const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current
+		return scrollHeight - scrollTop - clientHeight < 50
+	}
+
 	const toggleFile = (key: string) => {
 		const isCurrentlyExpanded = expandedFiles[key]
 		setExpandedFiles((prev) => ({ ...prev, [key]: !prev[key] }))
@@ -150,6 +261,127 @@ export default function Home() {
 			const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current
 			const isNearBottom = scrollHeight - scrollTop - clientHeight < 100
 			setShowScrollButton(!isNearBottom)
+
+			// Определяем активное сообщение пользователя с повышенной точностью
+			let activeIndex = -1
+			let bestScore = -Infinity
+
+			const container = chatContainerRef.current
+			const containerRect = container.getBoundingClientRect()
+			const viewportTop = containerRect.top
+			const viewportBottom = containerRect.bottom
+
+			// Проверяем, находимся ли мы внизу чата
+			const isAtBottom = scrollHeight - scrollTop - clientHeight < 50
+
+			// Получаем все индексы сообщений
+			const messageIndices = Array.from(userMessageRefs.current.keys())
+
+			if (messageIndices.length === 0) {
+				setActiveMessageIndex(-1)
+				return
+			}
+
+			userMessageRefs.current.forEach((element, index) => {
+				if (element) {
+					const rect = element.getBoundingClientRect()
+					const elementTop = rect.top
+					const elementBottom = rect.bottom
+
+					// Если мы внизу часта - выбираем последнее сообщение
+					if (isAtBottom) {
+						const lastIndex = Math.max(...messageIndices)
+						if (index === lastIndex) {
+							activeIndex = index
+							return
+						}
+					}
+
+					// Вычисляем, сколько процентов элемента видно во вьюпорте
+					const visibleTop = Math.max(viewportTop, elementTop)
+					const visibleBottom = Math.min(viewportBottom, elementBottom)
+					const visibleHeight = Math.max(0, visibleBottom - visibleTop)
+					const totalHeight = elementBottom - elementTop
+					const visiblePercentage =
+						totalHeight > 0 ? visibleHeight / totalHeight : 0
+
+					// Если элемент виден более чем на 5% (уменьшил порог)
+					if (visiblePercentage > 0.05) {
+						// Вычисляем позицию элемента относительно вьюпорта
+						const elementCenter = (elementTop + elementBottom) / 2
+						const viewportCenter = (viewportTop + viewportBottom) / 2
+
+						// Базовая метрика - видимость
+						let score = visiblePercentage
+
+						// Бонус за то, что элемент ближе к центру
+						const distanceFromCenter = Math.abs(elementCenter - viewportCenter)
+						const maxDistance = (viewportBottom - viewportTop) / 2
+						const centerBonus = 1 - (distanceFromCenter / maxDistance) * 0.5
+						score *= centerBonus
+
+						// Бонус за то, что элемент начинается в верхней части вьюпорта
+						if (elementTop >= viewportTop && elementTop <= viewportTop + 150) {
+							score += 0.3
+						}
+
+						// Бонус за полную видимость
+						if (elementTop >= viewportTop && elementBottom <= viewportBottom) {
+							score += 0.2
+						}
+
+						// Бонус за то, что элемент виден больше чем на 50%
+						if (visiblePercentage > 0.5) {
+							score += 0.1
+						}
+
+						if (score > bestScore) {
+							bestScore = score
+							activeIndex = index
+						}
+					}
+				}
+			})
+
+			// Если нашли активный индекс - сохраняем его
+			if (activeIndex !== -1) {
+				lastActiveIndexRef.current = activeIndex
+				setActiveMessageIndex(activeIndex)
+			}
+			// Если не нашли, но есть сохраненный и мы не внизу - пробуем найти ближайший
+			else if (lastActiveIndexRef.current !== -1 && !isAtBottom) {
+				// Ищем сообщение, ближайшее к сохраненному
+				let closestIndex = -1
+				let minDistance = Infinity
+
+				userMessageRefs.current.forEach((element, index) => {
+					if (element) {
+						const rect = element.getBoundingClientRect()
+						const elementCenter = (rect.top + rect.bottom) / 2
+						const viewportCenter = (viewportTop + viewportBottom) / 2
+						const distance = Math.abs(elementCenter - viewportCenter)
+
+						if (distance < minDistance) {
+							minDistance = distance
+							closestIndex = index
+						}
+					}
+				})
+
+				if (closestIndex !== -1) {
+					setActiveMessageIndex(closestIndex)
+					lastActiveIndexRef.current = closestIndex
+				} else {
+					// Если совсем ничего не нашли, показываем последнее активное
+					setActiveMessageIndex(lastActiveIndexRef.current)
+				}
+			}
+			// Если мы внизу и нет активного - устанавливаем последнее сообщение
+			else if (isAtBottom && messageIndices.length > 0) {
+				const lastIndex = Math.max(...messageIndices)
+				setActiveMessageIndex(lastIndex)
+				lastActiveIndexRef.current = lastIndex
+			}
 		}
 	}
 
@@ -250,11 +482,6 @@ export default function Home() {
 		}
 	}
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault()
-		await sendMessage(input)
-	}
-
 	const handleVoiceTranscript = (text: string) => {
 		if (text.trim()) {
 			sendMessage(text)
@@ -283,7 +510,6 @@ export default function Home() {
 		const isLightTheme = document.documentElement.classList.contains('light')
 		const currentThemeFromDom = isLightTheme ? 'light' : 'dark'
 
-		// Если есть сохраненная тема и она отличается от DOM - применяем её
 		if (savedTheme && savedTheme !== currentThemeFromDom) {
 			setTheme(savedTheme)
 			if (savedTheme === 'light') {
@@ -292,12 +518,24 @@ export default function Home() {
 				document.documentElement.classList.remove('light')
 			}
 		} else {
-			// Иначе синхронизируем состояние с DOM
 			setTheme(currentThemeFromDom)
-			// И сохраняем, если нет сохраненной
 			if (!savedTheme) {
 				localStorage.setItem('theme', currentThemeFromDom)
 			}
+		}
+	}, [])
+
+	// Получаем только сообщения ассистента для навигации
+	const assistantMessages = messages.filter(
+		(msg, idx) => msg.role === 'assistant'
+	)
+
+	useEffect(() => {
+		// При монтировании инициализируем активное сообщение
+		if (userMessageRefs.current.size > 0 && activeMessageIndex === -1) {
+			const lastIndex = Math.max(...Array.from(userMessageRefs.current.keys()))
+			setActiveMessageIndex(lastIndex)
+			lastActiveIndexRef.current = lastIndex
 		}
 	}, [])
 
@@ -324,7 +562,7 @@ export default function Home() {
 				>
 					{/* Заголовок тулбара */}
 					<div
-						className={`flex items-center justify-between p-3.5 border-b ${
+						className={`flex items-center justify-between p-2.5 border-b ${
 							theme === 'light' ? 'border-gray-200' : 'border-gray-800'
 						}`}
 					>
@@ -387,7 +625,7 @@ export default function Home() {
 
 					{/* Нижняя часть с переключателем темы */}
 					<div
-						className={`max-h-[87px] border-t ${isLight ? 'border-gray-200' : 'border-gray-800'}`}
+						className={`max-h-21.75 border-t ${isLight ? 'border-gray-200' : 'border-gray-800'}`}
 					>
 						<div className='py-3 px-4'>
 							<div className='flex items-center justify-between'>
@@ -427,7 +665,7 @@ export default function Home() {
 							className={`w-full py-3 flex items-center justify-center border-t ${isLight ? 'border-gray-200' : 'border-gray-800'}`}
 						>
 							<p className='text-xs text-center text-gray-400 dark:text-gray-500'>
-								POS GPT v1.0.0
+								POS GPT v{packageJson.version}
 							</p>
 						</div>
 					</div>
@@ -442,7 +680,6 @@ export default function Home() {
 					}`}
 				>
 					<div className='max-w-3xl'>
-						{/* Кнопка открытия тулбара */}
 						<button
 							onClick={() => setIsSidebarOpen(true)}
 							className={`p-1.5 rounded-lg transition-all duration-200 ${
@@ -456,6 +693,97 @@ export default function Home() {
 						</button>
 					</div>
 				</div>
+
+				{/* Навигационные точки (только для десктопа) */}
+				{!isMobile &&
+					(() => {
+						const userMessagesList = Array.from(
+							userMessageRefs.current.keys()
+						).sort((a, b) => a - b)
+
+						return (
+							userMessagesList.length > 0 && (
+								<div
+									className='fixed right-4 top-1/2 -translate-y-1/2 z-30'
+									onMouseEnter={handleMouseEnter}
+									onMouseLeave={handleMouseLeave}
+								>
+									{/* Точки */}
+									<div className='flex flex-col gap-2 items-end'>
+										{userMessagesList.map((realIndex, idx) => {
+											const isActive = activeMessageIndex === realIndex
+											const userMessage = messages[realIndex]?.content || ''
+											const previewText =
+												userMessage.slice(0, 30) +
+												(userMessage.length > 30 ? '...' : '')
+
+											return (
+												<button
+													key={idx}
+													onClick={() => scrollToMessage(realIndex)}
+													className={`rounded-full transition-all duration-200 cursor-pointer ${
+														isActive
+															? 'bg-blue-500 w-2 h-2'
+															: isLight
+																? 'bg-gray-400 hover:bg-gray-500 w-2 h-2'
+																: 'bg-gray-600 hover:bg-gray-500 w-2 h-2'
+													}`}
+													title={previewText}
+												/>
+											)
+										})}
+									</div>
+
+									{/* Список с вопросами пользователя при наведении */}
+									{isNavHovered && (
+										<div
+											className={`absolute right-full top-1/2 -translate-y-1/2 mr-3 p-2 rounded-lg shadow-xl border min-w-62.5 max-w-87.5 ${
+												isLight
+													? 'bg-white border-gray-200'
+													: 'bg-gray-800 border-gray-700'
+											}`}
+											onMouseEnter={handleMouseEnter}
+											onMouseLeave={handleMouseLeave}
+										>
+											<div className='space-y-1 max-h-80 overflow-y-auto'>
+												{userMessagesList.map((realIndex, idx) => {
+													const userMessage = messages[realIndex]?.content || ''
+													const previewText =
+														userMessage.slice(0, 50) +
+														(userMessage.length > 50 ? '...' : '')
+													const isActive = activeMessageIndex === realIndex
+
+													return (
+														<button
+															key={idx}
+															onClick={() => {
+																scrollToMessage(realIndex)
+																if (hideTimeoutRef.current) {
+																	clearTimeout(hideTimeoutRef.current)
+																}
+															}}
+															className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${
+																isActive
+																	? 'bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium'
+																	: isLight
+																		? 'hover:bg-gray-100 text-gray-700'
+																		: 'hover:bg-gray-700 text-gray-300'
+															}`}
+														>
+															<span className='wrap-break-word'>
+																{previewText}
+															</span>
+														</button>
+													)
+												})}
+											</div>
+										</div>
+									)}
+								</div>
+							)
+						)
+					})()}
+
 				{/* Messages */}
 				<div
 					ref={chatContainerRef}
@@ -470,6 +798,14 @@ export default function Home() {
 						{messages.map((message, idx) => (
 							<div
 								key={idx}
+								ref={(el) => {
+									if (el && message.role === 'user') {
+										userMessageRefs.current.set(idx, el)
+									}
+									if (el && message.role === 'assistant' && idx !== 0) {
+										botMessageRefs.current.set(idx, el)
+									}
+								}}
 								className={`flex gap-2 sm:gap-3 animate-fadeIn ${
 									message.role === 'user' ? 'justify-end' : 'justify-start'
 								}`}
@@ -603,7 +939,6 @@ export default function Home() {
 					}`}
 				>
 					<div className='max-w-3xl mx-auto'>
-						{/* Обычный режим */}
 						{!isVoiceMode && (
 							<div className='flex items-center gap-2 sm:gap-3 w-full'>
 								<div
@@ -633,7 +968,6 @@ export default function Home() {
 								</div>
 
 								{isMobile ? (
-									// Мобильное устройство
 									input.trim() ? (
 										<button
 											type='button'
@@ -668,7 +1002,6 @@ export default function Home() {
 										</button>
 									)
 								) : (
-									// Десктопное устройство - всегда кнопка отправки
 									<button
 										type='button'
 										onClick={() => sendMessage(input)}
@@ -697,7 +1030,6 @@ export default function Home() {
 							</div>
 						)}
 
-						{/* Голосовой режим - только для мобильных */}
 						{isVoiceMode && isMobile && (
 							<div className='flex gap-2 sm:gap-3 w-full'>
 								<VoiceInput
