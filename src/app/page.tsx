@@ -67,7 +67,7 @@ export default function Home() {
 		{
 			role: 'assistant',
 			content:
-				'Привет! Я ищу информацию в документации по ключевым словам. Спроси меня о прошивках, актуальных версиях или ошибках. Также могу найти нужный файл'
+				'Привет! Я ищу информацию в документации по ключевым словам. Помогу найти инструкцию о прошивке, информацию об актуальных версиях или ошибках. Также могу найти нужный файл и много чего ещё'
 		}
 	])
 	const [input, setInput] = useState('')
@@ -405,38 +405,48 @@ export default function Home() {
 
 					{/* Нижняя часть с переключателем темы */}
 					<div
-						className={`border-t p-4 ${isLight ? 'border-gray-200' : 'border-gray-800'}`}
+						className={`border-t py-4 px-0 ${isLight ? 'border-gray-200' : 'border-gray-800'}`}
 					>
-						<div className='flex items-center justify-between'>
-							<div className='flex items-center gap-2'>
-								{isLight ? (
-									<Sun
-										className={`w-4 h-4 ${isLight ? 'text-gray-600' : 'text-gray-400'}`}
-									/>
-								) : (
-									<Moon
-										className={`w-4 h-4 ${isLight ? 'text-gray-600' : 'text-gray-400'}`}
-									/>
-								)}
-								<span
-									className={`text-sm ${isLight ? 'text-gray-700' : 'text-gray-300'}`}
+						<div className='px-4'>
+							<div className='flex items-center justify-between'>
+								<div className='flex items-center gap-2'>
+									{isLight ? (
+										<Sun
+											className={`w-4 h-4 ${isLight ? 'text-gray-600' : 'text-gray-400'}`}
+										/>
+									) : (
+										<Moon
+											className={`w-4 h-4 ${isLight ? 'text-gray-600' : 'text-gray-400'}`}
+										/>
+									)}
+									<span
+										className={`text-sm ${isLight ? 'text-gray-700' : 'text-gray-300'}`}
+									>
+										Тема
+									</span>
+								</div>
+								<button
+									onClick={() => handleThemeChange(isLight ? 'dark' : 'light')}
+									className='relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500'
+									style={{
+										backgroundColor: isLight ? '#d1d5db' : '#3b82f6'
+									}}
 								>
-									Тема
-								</span>
+									<span
+										className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+											isLight ? 'translate-x-1' : 'translate-x-6'
+										}`}
+									/>
+								</button>
 							</div>
-							<button
-								onClick={() => handleThemeChange(isLight ? 'dark' : 'light')}
-								className='relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500'
-								style={{
-									backgroundColor: isLight ? '#d1d5db' : '#3b82f6'
-								}}
-							>
-								<span
-									className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-										isLight ? 'translate-x-1' : 'translate-x-6'
-									}`}
-								/>
-							</button>
+						</div>
+						{/* Версия приложения */}
+						<div
+							className={`w-full mt-4 pt-4 border-t ${isLight ? 'border-gray-200' : 'border-gray-800'}`}
+						>
+							<p className='text-xs text-center text-gray-400 dark:text-gray-500'>
+								POS GPT v1.0.0
+							</p>
 						</div>
 					</div>
 				</div>
@@ -447,7 +457,7 @@ export default function Home() {
 				<div
 					ref={chatContainerRef}
 					onScroll={handleScroll}
-					className='flex-1 overflow-y-auto px-2 sm:px-6 py-14 sm:py-3'
+					className='flex-1 overflow-y-auto px-2 sm:px-6 py-14'
 					style={{
 						WebkitOverflowScrolling: 'touch',
 						overscrollBehavior: 'contain'
