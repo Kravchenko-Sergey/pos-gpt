@@ -303,25 +303,8 @@ export default function Home() {
 
 	return (
 		<>
-			{/* Боковой тулбар */}
+			{/* Тулбар */}
 			<>
-				{/* Кнопка открытия тулбара */}
-				<button
-					onClick={() => setIsSidebarOpen(true)}
-					className={`fixed left-2 top-7 -translate-y-1/2 z-30 p-1.5 rounded-lg shadow-lg border transition-all duration-200 ${
-						isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'
-					} ${
-						theme === 'light'
-							? 'bg-white border-gray-300 hover:bg-gray-100'
-							: 'bg-gray-800 border-gray-700 hover:bg-gray-700'
-					}`}
-					title='Открыть меню'
-				>
-					<Menu
-						className={`w-5 h-5 ${theme === 'light' ? 'text-gray-700' : 'text-gray-400'}`}
-					/>
-				</button>
-
 				{/* Оверлей для мобильных устройств */}
 				{isSidebarOpen && isMobile && (
 					<div
@@ -330,7 +313,6 @@ export default function Home() {
 					/>
 				)}
 
-				{/* Боковой тулбар */}
 				<div
 					className={`fixed left-0 top-0 bottom-0 z-40 w-72 shadow-2xl border-r transition-transform duration-300 flex flex-col ${
 						isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -342,7 +324,7 @@ export default function Home() {
 				>
 					{/* Заголовок тулбара */}
 					<div
-						className={`flex items-center justify-between p-4 border-b ${
+						className={`flex items-center justify-between p-3.5 border-b ${
 							theme === 'light' ? 'border-gray-200' : 'border-gray-800'
 						}`}
 					>
@@ -405,9 +387,9 @@ export default function Home() {
 
 					{/* Нижняя часть с переключателем темы */}
 					<div
-						className={`border-t py-4 px-0 ${isLight ? 'border-gray-200' : 'border-gray-800'}`}
+						className={`max-h-[87px] border-t ${isLight ? 'border-gray-200' : 'border-gray-800'}`}
 					>
-						<div className='px-4'>
+						<div className='py-3 px-4'>
 							<div className='flex items-center justify-between'>
 								<div className='flex items-center gap-2'>
 									{isLight ? (
@@ -442,7 +424,7 @@ export default function Home() {
 						</div>
 						{/* Версия приложения */}
 						<div
-							className={`w-full mt-4 pt-4 border-t ${isLight ? 'border-gray-200' : 'border-gray-800'}`}
+							className={`w-full py-3 flex items-center justify-center border-t ${isLight ? 'border-gray-200' : 'border-gray-800'}`}
 						>
 							<p className='text-xs text-center text-gray-400 dark:text-gray-500'>
 								POS GPT v1.0.0
@@ -453,6 +435,27 @@ export default function Home() {
 			</>
 
 			<div className='fixed inset-0 bg-gray-900 flex flex-col'>
+				{/* Кнопка открытия тулбара */}
+				<div
+					className={`shrink-0 backdrop-blur-md px-1 sm:px-2 py-1 sm:py-2 z-10 border-b ${
+						isLight ? 'bg-white border-gray-300' : 'bg-gray-900 border-gray-700'
+					}`}
+				>
+					<div className='max-w-3xl'>
+						{/* Кнопка открытия тулбара */}
+						<button
+							onClick={() => setIsSidebarOpen(true)}
+							className={`p-1.5 rounded-lg transition-all duration-200 ${
+								isLight
+									? 'hover:bg-gray-100 text-gray-600'
+									: 'hover:bg-gray-700 text-gray-400'
+							}`}
+							title='Открыть меню'
+						>
+							<Menu className='w-5 h-5' />
+						</button>
+					</div>
+				</div>
 				{/* Messages */}
 				<div
 					ref={chatContainerRef}
@@ -593,10 +596,10 @@ export default function Home() {
 
 				{/* Input form */}
 				<div
-					className={`shrink-0 px-3 sm:px-6 py-3 sm:py-5 backdrop-blur-md border-t ${
+					className={`shrink-0 px-2 sm:px-6 py-3 sm:py-5 backdrop-blur-md border-t ${
 						theme === 'light'
-							? 'bg-white/95 border-gray-200'
-							: 'bg-gray-800/95 border-gray-700'
+							? 'bg-white border-gray-300'
+							: 'bg-gray-900 border-gray-700'
 					}`}
 				>
 					<div className='max-w-3xl mx-auto'>
