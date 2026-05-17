@@ -23,6 +23,15 @@ body {
 	font-family: var(--font-geist-sans, system-ui, -apple-system, sans-serif);
 }
 
+/* Предотвращаем flash темы */
+html {
+	background-color: #111827;
+}
+
+html.light {
+	background-color: #ffffff;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
 	width: 8px;
@@ -41,6 +50,21 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
 	background: #94a3b8;
+}
+
+/* Темная тема для скроллбара */
+@media (prefers-color-scheme: dark) {
+	::-webkit-scrollbar-track {
+		background: #1f2937;
+	}
+
+	::-webkit-scrollbar-thumb {
+		background: #4b5563;
+	}
+
+	::-webkit-scrollbar-thumb:hover {
+		background: #6b7280;
+	}
 }
 
 /* Анимация для микрофона */
@@ -105,4 +129,224 @@ body {
 		background: rgba(156, 163, 175, 0.5);
 		border-radius: 10px;
 	}
+}
+
+/* ========== СТИЛИ ДЛЯ ФУТЕРА ========== */
+footer {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 10;
+}
+
+/* Стили для футера в светлой теме */
+.light footer {
+	background-color: rgba(255, 255, 255, 0.95);
+	border-top-color: #e5e7eb;
+}
+
+/* Стили для футера в темной теме */
+footer {
+	background-color: rgba(31, 41, 55, 0.95);
+	border-top-color: #374151;
+}
+
+/* Адаптивный футер */
+@media (max-width: 768px) {
+	footer {
+		padding-left: 0.75rem;
+		padding-right: 0.75rem;
+	}
+}
+
+/* ========== СТИЛИ ДЛЯ СВЕТЛОЙ ТЕМЫ (класс .light) ========== */
+.light {
+	color-scheme: light;
+}
+
+/* Фоны */
+.light .bg-gray-900 {
+	background-color: #f9fafb;
+}
+
+.light .bg-gray-800 {
+	background-color: #ffffff;
+}
+
+.light .bg-gray-800\/90,
+.light .bg-gray-800\/95 {
+	background-color: rgba(255, 255, 255, 0.95);
+}
+
+.light .bg-gray-700 {
+	background-color: #f3f4f6;
+}
+
+.light .bg-gray-700\/50 {
+	background-color: rgba(243, 244, 246, 0.8);
+}
+
+.light .bg-gray-900\/30 {
+	background-color: rgba(243, 244, 246, 0.5);
+}
+
+.light .bg-gray-800\/50 {
+	background-color: rgba(243, 244, 246, 0.8);
+}
+
+/* Текст */
+.light .text-white {
+	color: #111827;
+}
+
+.light .text-gray-100,
+.light .text-gray-300 {
+	color: #374151;
+}
+
+.light .text-gray-400 {
+	color: #6b7280;
+}
+
+.light .text-gray-500 {
+	color: #9ca3af;
+}
+
+.light ::placeholder,
+.light .placeholder-gray-500::placeholder {
+	color: #9ca3af;
+}
+
+/* Границы */
+.light .border-gray-700,
+.light .border-gray-800,
+.light .border-gray-700\/50 {
+	border-color: #e5e7eb;
+}
+
+.light .border-gray-600\/50 {
+	border-color: #d1d5db;
+}
+
+/* Hover состояния */
+.light .hover\:bg-gray-700:hover {
+	background-color: #e5e7eb;
+}
+
+.light .hover\:bg-gray-600:hover {
+	background-color: #d1d5db;
+}
+
+.light .hover\:border-gray-500:hover {
+	border-color: #9ca3af;
+}
+
+.light .hover\:text-white:hover {
+	color: #111827;
+}
+
+/* Sidebar специфичные стили */
+.light .bg-gray-900.shadow-2xl {
+	background-color: #ffffff;
+	box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+.light .border-gray-800 {
+	border-color: #e5e7eb;
+}
+
+.light .hover\:bg-gray-800:hover {
+	background-color: #f3f4f6;
+}
+
+/* Кнопки в тулбаре */
+.light button.bg-gray-800 {
+	background-color: #f3f4f6;
+}
+
+.light button.bg-gray-800:hover {
+	background-color: #e5e7eb;
+}
+
+/* Инпут */
+.light .focus-within\:border-blue-500:focus-within {
+	border-color: #3b82f6;
+}
+
+/* Сообщения ассистента */
+.light .bg-gray-800.text-gray-100 {
+	background-color: #ffffff;
+	color: #111827;
+}
+
+/* Файлы */
+.light .bg-gray-800.rounded-xl {
+	background-color: #ffffff;
+}
+
+.light .bg-gray-700.text-green-400 {
+	background-color: #f3f4f6;
+}
+
+.light .text-green-400 {
+	color: #059669;
+}
+
+.light .hover\:text-green-300:hover {
+	color: #047857;
+}
+
+/* Индикатор загрузки */
+.light .bg-gray-800.border-gray-700 {
+	background-color: #ffffff;
+	border-color: #e5e7eb;
+}
+
+/* Scrollbar для светлой темы */
+.light ::-webkit-scrollbar-track {
+	background: #e5e7eb;
+}
+
+.light ::-webkit-scrollbar-thumb {
+	background: #9ca3af;
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+	background: #6b7280;
+}
+
+/* Анимация */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.animate-fadeIn {
+	animation: fadeIn 0.3s ease;
+}
+
+/* Дополнительные утилиты для совместимости */
+.transition-all {
+	transition-property: all;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
+}
+
+.cursor-pointer {
+	cursor: pointer;
+}
+
+.cursor-not-allowed {
+	cursor: not-allowed;
+}
+
+.shrink-0 {
+	flex-shrink: 0;
 }

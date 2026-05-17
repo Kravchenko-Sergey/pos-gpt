@@ -46,8 +46,35 @@ export default function RootLayout({
 	children: React.ReactNode
 }) {
 	return (
-		<html lang='ru'>
+		<html lang='ru' suppressHydrationWarning>
 			<head>
+				{/* Скрипт для предотвращения flash темы */}
+				<script
+					dangerouslySetInnerHTML={{
+						__html: `
+							(function() {
+								try {
+									const savedTheme = localStorage.getItem('theme');
+									const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+									const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+									
+									if (theme === 'light') {
+										document.documentElement.classList.add('light');
+									} else {
+										document.documentElement.classList.remove('light');
+									}
+									
+									// Устанавливаем цвет фона для предотвращения flash
+									if (theme === 'light') {
+										document.documentElement.style.backgroundColor = '#ffffff';
+									} else {
+										document.documentElement.style.backgroundColor = '#111827';
+									}
+								} catch (e) {}
+							})();
+						`
+					}}
+				/>
 				<link rel='apple-touch-icon' href='/icons/icon-152x152.png' />
 				<link rel='manifest' href='/manifest.json' />
 				<meta name='apple-mobile-web-app-capable' content='yes' />
